@@ -10,7 +10,15 @@
 
 /* Ports that each PIC sits on */
 #define MASTER_8259_PORT 0x20
+#define MASTER_8259_IMR  0x21
+#define MASTER_8259_ISR MASTER_8259_PORT
+#define MASTER_8259_POLL MASTER_8259_ISR
+#define MASTER_8259_OCW3 MASTER_8259_ISR
 #define SLAVE_8259_PORT  0xA0
+#define SLAVE_8259_IMR   0xA1
+
+/* Number of ports on a single pic */
+#define PORTS 8
 
 /* Initialization control words to init each PIC.
  * See the Intel manuals for details on the meaning
@@ -26,6 +34,8 @@
  * the interrupt number and sent out to the PIC
  * to declare the interrupt finished */
 #define EOI             0x60
+#define ALL_MASK 		0xFF
+#define LONG_MASK 		0xFF00
 
 /* Externally-visible functions */
 
