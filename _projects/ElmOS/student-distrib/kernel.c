@@ -144,6 +144,12 @@ entry (unsigned long magic, unsigned long addr)
 		ltr(KERNEL_TSS);
 	}
 
+	/* disable all interrupts on PIC */
+	for(i = 0; i < 15; i++)
+	{
+		disable_irq(i);
+	}
+	
 	/* Init the PIC */
 	i8259_init();
 
