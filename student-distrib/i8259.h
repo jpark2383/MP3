@@ -34,6 +34,7 @@
  * the interrupt number and sent out to the PIC
  * to declare the interrupt finished */
 #define EOI             0x60
+#define EOI_NEW			0x20
 #define ALL_MASK 		0xFF
 #define LONG_MASK 		0xFF00
 
