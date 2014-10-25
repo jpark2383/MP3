@@ -9,7 +9,6 @@
 
 void set_trap_gate(uint32_t num, uint32_t address);
 void set_intr_gate(uint32_t num, uint32_t address);
-void set_system_gate(uint32_t num, uint32_t address);
 
 extern void init_idt();
 
