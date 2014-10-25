@@ -145,6 +145,7 @@ entry (unsigned long magic, unsigned long addr)
 	}
 
 	/* disable all interrupts on PIC */
+	int i;
 	for(i = 0; i < 15; i++)
 	{
 		disable_irq(i);
