@@ -2,8 +2,8 @@
 #include "types.h"
 #include "idt.h"
 #include "lib.h"
-#include "intr_handler.h"
-#include "system_wrapper.h"
+//#include "intr_handler.h"
+//#include "system_wrapper.h"
 
 /* 
  * set_trap_gate
@@ -17,14 +17,14 @@
 void set_trap_gate(uint32_t num, uint32_t address)
 {
 	idt[num].seg_selector = KERNEL_CS;
-	idt[num].reserved4 &= mask_reserve;
-	idt[num].reserved3 = mask1;
-	idt[num].reserved2 = mask1;
-	idt[num].reserved1 = mask1;
-	idt[num].size = mask1;
-	idt[num].reserved0 = mask0;
-	idt[num].dpl = dpl0;
-	idt[num].present = mask1;
+	idt[num].reserved4 &= six_bit_mask;
+	idt[num].reserved3 = one_mask;
+	idt[num].reserved2 = one_mask;
+	idt[num].reserved1 = one_mask;
+	idt[num].size = one_mask;
+	idt[num].reserved0 = zero_mask;
+	idt[num].dpl = zero_dpl;
+	idt[num].present = one_mask;
 	SET_IDT_ENTRY(idt[num], address);
 }
 
@@ -40,14 +40,14 @@ void set_trap_gate(uint32_t num, uint32_t address)
 void set_intr_gate(uint32_t num, uint32_t address)
  {
  	idt[num].seg_selector = KERNEL_CS;
-	idt[num].reserved4 &= mask_reserve;
-	idt[num].reserved3 = mask0;
-	idt[num].reserved2 = mask1;
-	idt[num].reserved1 = mask1;
-	idt[num].size = mask1;
-	idt[num].reserved0 = mask0;
-	idt[num].dpl = dpl0;
-	idt[num].present = mask1;
+	idt[num].reserved4 &= six_bit_mask;
+	idt[num].reserved3 = zero_mask;
+	idt[num].reserved2 = one_mask;
+	idt[num].reserved1 = one_mask;
+	idt[num].size = one_mask;
+	idt[num].reserved0 = zero_mask;
+	idt[num].dpl = zero_dpl;
+	idt[num].present = one_mask;
 	SET_IDT_ENTRY(idt[num], address);
  }
 
@@ -63,14 +63,14 @@ void set_intr_gate(uint32_t num, uint32_t address)
 void set_system_gate(uint32_t num, uint32_t address)
 {
 	 idt[num].seg_selector = KERNEL_CS;
-	idt[num].reserved4 &= mask_reserve;
-	idt[num].reserved3 = mask1;
-	idt[num].reserved2 = mask1;
-	idt[num].reserved1 = mask1;
-	idt[num].size = mask1;
-	idt[num].reserved0 = mask0;
-	idt[num].dpl = dpl3;
-	idt[num].present = mask1;
+	idt[num].reserved4 &= six_bit_mask;
+	idt[num].reserved3 = one_mask;
+	idt[num].reserved2 = one_mask;
+	idt[num].reserved1 = one_mask;
+	idt[num].size = one_mask;
+	idt[num].reserved0 = zero_mask;
+	idt[num].dpl = three_dpl;
+	idt[num].present = one_mask;
 	SET_IDT_ENTRY(idt[num], address);
 }
 /*
@@ -107,26 +107,14 @@ void init_idt()
 		set_trap_gate(i, (uint32_t)&ignore_int);
 	for(i = 32; i < 256; i++)
 		set_intr_gate(i, (uint32_t)&ignore_int);
-	set_intr_gate(32, (uint32_t)&scheduling_handler);
-	set_intr_gate(33, (uint32_t)&keyboard_handler);
-	set_intr_gate(40, (uint32_t)&rtc_handler);
-	set_system_gate(128,(uint32_t)&system_handler);
+	//set_intr_gate(33, (uint32_t)&keyboard_handler);
+	//set_intr_gate(40, (uint32_t)&rtc_handler);
 }
 
 // Code for all of the Exceptions
 void divide_by_0()
 {
-	//helper function : blue screen of death
-	bsod();
-	//another helper function, print out char with the bsod backgroupd
-	bsod_putchar('D');	bsod_putchar('i');	bsod_putchar('v');	bsod_putchar('i');	bsod_putchar('d');	bsod_putchar('e');
-	bsod_putchar(' ');
-	bsod_putchar('b');	bsod_putchar('y');
-	bsod_putchar(' ');
-	bsod_putchar('z');	bsod_putchar('e');	bsod_putchar('r');	bsod_putchar('o');
-	bsod_putchar(' ');
-	bsod_putchar('e');	bsod_putchar('x');	bsod_putchar('c');	bsod_putchar('e');	bsod_putchar('p');
-	bsod_putchar('t');	bsod_putchar('i');	bsod_putchar('o');	bsod_putchar('n');	bsod_putchar('\n');
+	printf("divide_by_0 error exception");
 	cli();
 	while(1);
 }
@@ -210,16 +198,8 @@ void general_protection()
 }
 void page_fault()
 {
-	
-	//bsod();
 	printf("page_fault exception\n");
-	/*bsod_putchar('P');	bsod_putchar('a');	bsod_putchar('g');	bsod_putchar('e');	bsod_putchar('_');
-	bsod_putchar('f');	bsod_putchar('a');	bsod_putchar('u');	bsod_putchar('l');	bsod_putchar('t');
-	bsod_putchar(' ');
-	bsod_putchar('e');	bsod_putchar('x');	bsod_putchar('c');	bsod_putchar('e');	bsod_putchar('p');
-	bsod_putchar('t');	bsod_putchar('i');	bsod_putchar('o');	bsod_putchar('n');	bsod_putchar('\n');
-	*/cli();
-	
+	cli();
 	while(1);
 }
 void coprocessor_fault()

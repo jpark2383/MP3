@@ -1,11 +1,11 @@
 #ifndef _IDT_H
 #define _IDT_H
 
-#define 6_bit_mask 	0x1F
-#define 0_mask 		0
-#define 1_mask		1
-#define 0_dpl		0
-#define 3_dpl		3
+#define six_bit_mask 	0x1F
+#define zero_mask 		0
+#define one_mask		1
+#define zero_dpl		0
+#define three_dpl		3
 
 void set_trap_gate(uint32_t num, uint32_t address);
 void set_intr_gate(uint32_t num, uint32_t address);
