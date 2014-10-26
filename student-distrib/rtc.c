@@ -1,5 +1,6 @@
 #include "rtc.h"	
-	
+
+/* Initialize the RTC to allow interrupts */
 void rtc_init(){	
 	uint8_t prev_val;					// keep previous value of Register B
 	
@@ -11,4 +12,8 @@ void rtc_init(){
 	
 	enable_irq(IRQ2);					// turn on IRQ2
 	enable_irq(IRQ8);					// turn on IRQ8
+}
+
+void rtc_handler(){
+	// test_interrupts();
 }

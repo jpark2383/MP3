@@ -15,5 +15,6 @@
 #define IRQ8 0x08
 
 extern void rtc_init();
+extern void rtc_handler();
 
 #endif
