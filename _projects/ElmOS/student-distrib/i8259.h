@@ -37,7 +37,7 @@
 #define EOI_NEW			0x20
 #define ALL_MASK 		0xFF
 #define LONG_MASK 		0xFF00
-
+#define PIC_1 			0x01
 /* Externally-visible functions */
 
 /* Initialize both PICs */
