@@ -18,3 +18,11 @@ unsigned char read_translate_scancode(){
 	uint8_t scancode = inb(keyboard_rw_port);
 	return key_codes[scancode];
 }
+
+void keyboard_handler()
+{
+	unsigned char code;
+	code = read_translate_scancode();
+	putc(code);
+	send_eoi(PIC_1);
+}

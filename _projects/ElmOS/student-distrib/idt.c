@@ -2,8 +2,8 @@
 #include "types.h"
 #include "idt.h"
 #include "lib.h"
+#include "keyboard.h"
 //#include "intr_handler.h"
-//#include "system_wrapper.h"
 
 /* 
  * set_trap_gate
@@ -107,7 +107,7 @@ void init_idt()
 		set_trap_gate(i, (uint32_t)&ignore_int);
 	for(i = 32; i < 256; i++)
 		set_intr_gate(i, (uint32_t)&ignore_int);
-	//set_intr_gate(33, (uint32_t)&keyboard_handler);
+	set_intr_gate(33, (uint32_t)&keyboard_handler);
 	//set_intr_gate(40, (uint32_t)&rtc_handler);
 }
 
