@@ -158,12 +158,12 @@ entry (unsigned long magic, unsigned long addr)
 	{
 		disable_irq(i);
 	}
+
+	/* Initialize devices, memory, filesystem, enable device interrupts on the
+	 * PIC, any other initialization stuff... */\
 	paging_init();	
 	rtc_init();
 	enable_irq(PIC_1);
-	/* Initialize devices, memory, filesystem, enable device interrupts on the
-	 * PIC, any other initialization stuff... */\
-
 
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
@@ -171,7 +171,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
-	clear();
+	clear(); // Clears the screen before test_interrupts
 	//int x = 1/0;
 	
 
