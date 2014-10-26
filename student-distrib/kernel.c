@@ -5,10 +5,12 @@
 #include "multiboot.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "idt.h"
 #include "i8259.h"
 #include "debug.h"
 #include "keyboard.h"
 #include "pagefile.h"
+
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -144,29 +146,32 @@ entry (unsigned long magic, unsigned long addr)
 		tss.esp0 = 0x800000;
 		ltr(KERNEL_TSS);
 	}
-
 	/* disable all interrupts on PIC */
+
+	/* Init the PIC */
+	i8259_init();
+	
+	init_idt();
 	int i;
-	for(i = 0; i < 15; i++)
+	for(i = 0; i < 16; i++)
 	{
 		disable_irq(i);
 	}
-	
-	/* Init the PIC */
-	i8259_init();
 	paging_init();	
+	enable_irq(PIC_1);
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */\
 
-    enable_irq(PIC_1);
-	int * x = NULL;
-	int y = *x;
+
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
+	//int x = 1/0;
+	
+
 
 	/* Execute the first program (`shell') ... */
 

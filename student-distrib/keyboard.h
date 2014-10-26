@@ -9,5 +9,5 @@
 #define keyboard_command_port   0x64
 
 extern unsigned char read_translate_scancode();
-
+extern void keyboard_handler();
 #endif
