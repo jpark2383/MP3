@@ -9,6 +9,7 @@
 #include "i8259.h"
 #include "debug.h"
 #include "keyboard.h"
+#include "rtc.h"
 #include "pagefile.h"
 
 /* Macros. */
@@ -158,6 +159,7 @@ entry (unsigned long magic, unsigned long addr)
 		disable_irq(i);
 	}
 	paging_init();	
+	rtc_init();
 	enable_irq(PIC_1);
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */\
@@ -171,7 +173,6 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
 	//int x = 1/0;
 	
-
 
 	/* Execute the first program (`shell') ... */
 

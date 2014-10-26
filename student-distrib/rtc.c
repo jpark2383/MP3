@@ -14,6 +14,8 @@ void rtc_init(){
 	enable_irq(IRQ8);					// turn on IRQ8
 }
 
-void rtc_handler(){
-	// test_interrupts();
+void rtc_interrupt(){
+	putc('s');
+	send_eoi(IRQ8);
+	send_eoi(IRQ2);
 }
