@@ -14,7 +14,7 @@
 #define IRQ2 0x02
 #define IRQ8 0x08
 
-extern void rtc_init();
-extern void rtc_interrupt();
+extern void rtc_init(); // Initilization of the RTC. Starts at 2
+extern void rtc_interrupt(); // Handler for RTC interrupts
 
 #endif

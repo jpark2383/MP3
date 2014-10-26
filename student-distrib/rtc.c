@@ -1,6 +1,13 @@
 #include "rtc.h"	
 
-/* Initialize the RTC to allow interrupts */
+/*
+* rtc_init
+*   DESCRIPTION: Initialize the RTC to allow interrupts
+*   INPUTS: None
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Initilizes the rtc to frequency 2Hz
+*/ 
 void rtc_init(){	
 	uint8_t prev_val;					// keep previous value of Register B
 	
@@ -21,13 +28,21 @@ void rtc_init(){
 	enable_irq(IRQ8);					// turn on IRQ8
 }
 
-void rtc_interrupt(){
-	//clear();
-	test_interrupts();
+/*
+* rtc_interrupt
+*   DESCRIPTION: Handler for RTC interrupts
+*   INPUTS: None
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Initilizes the rtc to frequency 2Hz
+*/ 
+void rtc_interrupt()
+{
+	test_interrupts(); // Run test_interrupts
 	//putc('s');
 	outb(0x0C, 0x70);	// select register C
-	inb(0x71);		// just throw away contents
+	inb(0x71);		// throw away data contents
 
-	send_eoi(8);
+	send_eoi(8); //Send EOIs
 	send_eoi(2);
 }

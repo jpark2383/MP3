@@ -10,7 +10,14 @@
 uint8_t master_mask = ALL_MASK; /* IRQs 0-7 */
 uint8_t slave_mask = ALL_MASK; /* IRQs 8-15 */
 
-/* Initialize the 8259 PIC */
+/*
+* i8259_init
+*   DESCRIPTION: Initialize the 8259 PIC
+*   INPUTS: None
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: initializes the 8259 to start taking interrupts
+*/   
 void
 i8259_init(void)
 {
@@ -32,7 +39,14 @@ i8259_init(void)
 	restore_flags(flag);
 }
 
-/* Enable (unmask) the specified IRQ */
+/*
+* enable_irq
+*   DESCRIPTION: Enable (unmask) the specified IRQ
+*   INPUTS: uint32_t arg - the port on the PIC to enable
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Enables port arg on the PIC
+*/   
 void
 enable_irq(uint32_t arg)
 {
@@ -48,7 +62,14 @@ enable_irq(uint32_t arg)
 	}
 }
 
-/* Disable (mask) the specified IRQ */
+/*
+* disable_irq
+*   DESCRIPTION: Disable (unmask) the specified IRQ
+*   INPUTS: uint32_t arg - the port on the PIC to disable
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Disables port arg on the PIC
+*/  
 void
 disable_irq(uint32_t arg)
 {
@@ -64,7 +85,14 @@ disable_irq(uint32_t arg)
 	}
 }
 
-/* Send end-of-interrupt signal for the specified IRQ */
+/*
+* send_eoi
+*   DESCRIPTION: Send end-of-interrupt signal for the specified IRQ
+*   INPUTS: uint32_t arg - the port on the PIC to send to
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Sends EOI to port arg to notify handler finish
+*/  
 void
 send_eoi(uint32_t arg)
 {
