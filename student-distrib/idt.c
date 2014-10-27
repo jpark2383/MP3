@@ -1,3 +1,7 @@
+/* idt.c - Functions to set the IDT
+ * vim:ts=4 noexpandtab
+ */
+
 #include "x86_desc.h"
 #include "types.h"
 #include "idt.h"

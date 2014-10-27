@@ -1,3 +1,7 @@
+/* keyboard.c - Functions to interact with the keyboard
+ * vim:ts=4 noexpandtab
+ */
+
 #include "keyboard.h"
 
 // handle numbers and lower case letters 
@@ -41,6 +45,14 @@ unsigned char key_codes[90] = {
 	35,			//undefined
 	};
 
+	/*
+* read_keyboard
+*   DESCRIPTION: Read scancode from keyboard's data port and translate it into char
+*   INPUTS: None
+*   OUTPUTS: None
+*   RETURN VALUE: None
+*   SIDE EFFECTS: Sends EOI to corresponding PIC
+*/ 
 void read_keyboard()
 {
 	unsigned char code;

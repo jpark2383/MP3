@@ -1,3 +1,8 @@
+/* keyboard.h - Defines used in interactions with the keyboard
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H
 
