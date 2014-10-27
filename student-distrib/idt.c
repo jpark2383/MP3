@@ -16,6 +16,7 @@
 
 void set_trap_gate(uint32_t num, uint32_t address)
 {
+	//Set bits to correct values
 	idt[num].seg_selector = KERNEL_CS;
 	idt[num].reserved4 &= six_bit_mask;
 	idt[num].reserved3 = one_mask;
@@ -39,6 +40,7 @@ void set_trap_gate(uint32_t num, uint32_t address)
 
 void set_intr_gate(uint32_t num, uint32_t address)
  {
+ 	//Set bits to correct values
  	idt[num].seg_selector = KERNEL_CS;
 	idt[num].reserved4 &= six_bit_mask;
 	idt[num].reserved3 = zero_mask;
@@ -62,7 +64,8 @@ void set_intr_gate(uint32_t num, uint32_t address)
 
 void set_system_gate(uint32_t num, uint32_t address)
 {
-	 idt[num].seg_selector = KERNEL_CS;
+	//Set bits to correct values
+	idt[num].seg_selector = KERNEL_CS;
 	idt[num].reserved4 &= six_bit_mask;
 	idt[num].reserved3 = one_mask;
 	idt[num].reserved2 = one_mask;
@@ -82,6 +85,7 @@ void set_system_gate(uint32_t num, uint32_t address)
  */
 void init_idt()
 {
+	//Set gates depending on exception
 	int i =0;
 	set_trap_gate(0,(uint32_t)&divide_by_0);
 	set_trap_gate(1,(uint32_t)&debug);
