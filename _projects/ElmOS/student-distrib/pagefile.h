@@ -15,23 +15,12 @@
 #define VIDEO_MEM_LOCATION 184
 #define VIDEO_MEM_PAGE_SU 0x000B8005
 #define VIDEO_MEM_PAGE_U 0x000B8007
-#define MB_8_MAP 0x00800087 //Setting S , R , P , U
-#define MB_12_MAP 0x00C00087 //Setting S , R , P , U
-#define MB_16_MAP 0x01000087 //Setting S , R , P , U
-#define MB_20_MAP 0x01400087 //Setting S , R , P , U
-#define MB_24_MAP 0x01800087 //Setting S , R , P , U
-#define MB_28_MAP 0x01C00087 //Setting S , R , P , U
-
-#define MB_32_MAP 0x02000087 //Setting S , R , P , U
 
 #define CR4_PSE 0x00000010
 #define ENABLE_PAGING 0x80000000
 #define EMPTY 0
 //uint32_t page_directory[NUM_ENTRIES_PD] __attribute__ ((aligned(KB_4))); 
 //uint32_t page_table[NUM_ENTRIES_PT] __attribute__((aligned(KB_4))); 
-
-
-
 
 extern void paging_init();
 

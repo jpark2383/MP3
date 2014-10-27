@@ -1,6 +1,7 @@
 .globl	keyboard_handler
 .globl rtc_handler
 
+/*interrupt handler for keyboard, save all the registers and call read_keyboard*/
 keyboard_handler:
 _keyboard_handler:
 
@@ -34,7 +35,8 @@ _keyboard_handler:
 		sti
 		
 		iret
-
+		
+/*interrupt handler for rtc, save all registers and call rtc interrupt*/
 rtc_handler:
 _rtc_handler:
 
