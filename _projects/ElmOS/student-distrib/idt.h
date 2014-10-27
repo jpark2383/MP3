@@ -1,3 +1,8 @@
+/* i8259.h - Defines used in idt.c
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+ 
 #ifndef _IDT_H
 #define _IDT_H
 
