@@ -254,7 +254,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  		return -1;
  	for(k = 0; k < length; k++)
  	{
-		if(y >= HEIGHT - 1)
+		/*if(y >= HEIGHT - 1)
 		{
 			printf("line 256\n");
 			for(i = 0; i <= HEIGHT; i++)
@@ -273,7 +273,27 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 				}
 			}
 			set_cursor(0,y);
+		}*/
+		if(y >= HEIGHT - 1)
+		{
+			//printf("shift page\n");
+			for(i = 0; i < HEIGHT; i++)
+			{
+				for(j = 0; j < WIDTH; j++)
+					text_hist[i][j] = get_char(j, i);
+			}
+			clear();
+			//set_cursor(0,0);
+			for(i = 1; i < HEIGHT; i++)
+			{
+				set_cursor(0,i - 1);
+				for(j = 0; j < WIDTH; j++)
+				{
+					putc(text_hist[i][j]);
+				}
+			}
 		}
+		putc('\n');
  		if(text[k] == NULL)
  		{
  		}
