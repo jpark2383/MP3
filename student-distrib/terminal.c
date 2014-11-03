@@ -274,6 +274,8 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 			}
 			set_cursor(0,y);
 		}*/
+		x = getx();
+		y = gety();
 		if(y >= HEIGHT - 1)
 		{
 			//printf("shift page\n");
