@@ -166,7 +166,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */\
-	paging_init();	
+	paging_init();
 	rtc_init();
 	init_fs();
 	enable_irq(PIC_1);
@@ -179,6 +179,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
+	/*
 	printf("testing terminal \n");
 	unsigned char buf[4000] = "!@#$QWE^&*()1234567890\n";
 	terminal_write(1, buf, 4000);
@@ -189,20 +190,35 @@ entry (unsigned long magic, unsigned long addr)
 	printf("done testing terminal \n");
 	//clear(); // Clears the screen before test_interrupts
 	//int x = 1/0;
+	// Tests for RTC
+	for(i = 0; i < 10000000; i++);
+	rtc_read(0,0,0);
+	//int j = 1024;
+	//rtc_write(0,&j,4);
+	for(i = 0; i < 1000000000; i++);
+	rtc_read(0,0,0);
+*/
+
+	/*testing open and read file*/
 	
-	uint8_t filename[] = "frame1.txt";
-	uint8_t buffer[500];
+	uint8_t filename[] = ".";
+	uint8_t buffer[3000];
 	int res;
 	res = filesystem_open(filename);
 	if(res == -1)
-		printf("not able to open the file");
-	filesystem_read(0, buffer, 500);
-	for(i = 0; i < 500; i++)
+		terminal_write(1, (const uint8_t *)"not able to open the file", 200);
+	else
 	{
-		printf("%c", buffer[i]);
-	}
+		filesystem_read(0, buffer, 3000);
+			terminal_write(1, buffer, 3000);
+    }
+	
+	
+	/*testing read directory*/
+	//dirread();
+	
 	/* Execute the first program (`shell') ... */
-
+	
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
 }

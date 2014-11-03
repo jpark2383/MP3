@@ -31,10 +31,10 @@ int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry)
 	for(i = 0; i < MAX_FILE; i++)
 	{
 		memcpy(file_name, (filesystem.dentry_begin + i*B_64), B_32);
-		if(strncmp((const int8_t*)fname, (const int8_t*)file_name, B_32) ==0)
+		if(strncmp((const int8_t*)fname, (const int8_t*)file_name, B_32) == 0)
 		{	
 			memcpy(dentry, (filesystem.dentry_begin + i*B_64), B_40);
-			printf("inode is %d", dentry->inode_number);
+			//printf("inode is %d", dentry->inode_number);
 			return 0;
 		}
 	}
@@ -75,13 +75,13 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*1024));
 	uint8_t * temp_buf = buf;
 	int i;
-	
+
 	// clears the buffer
 	for(i = 0; i < length; i++)
 	{
 		buf[i] = 0;
-		
 	}
+
 	//checks if inode index is valid
 	if(inode < 0 || inode >= (filesystem.num_inodes - 1))
 	{
@@ -177,6 +177,10 @@ int32_t filesystem_close(int32_t fd)
  */
 int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes)
 {
+	if(dentry[fd].file_type == 1)
+	{
+		return dirread();
+	}
 	return read_data(dentry[fd].inode_number, 0, buf, nbytes);
 }
  /* 
@@ -203,4 +207,34 @@ int32_t dirclose(int32_t fd)
     
 }
 
+/* 
+ * read_dir
+ *   DESCRIPTION: searches the directory entries for regular files
+ *   INPUTS: filename, dentry to fill	
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: prints the dierectory to the terminal screen
+ */
+ 
+int32_t dirread(int32_t fd, void* buf, int32_t nbytes)
+{
+	uint32_t i , temp;
+	uint8_t max_string[B_32];
+	uint8_t * currptr;
+	for(i = 0; i < filesystem.num_dir_entries; i++)
+    {
+		currptr = filesystem.dentry_begin + (i)*(B_64);
+		temp = *(currptr + B_32);
+		if(temp)
+		{
+			memcpy(max_string,currptr,B_32);
+			printf("%s\n",max_string);
+		}
+	}
+	return 0;
+}
 
+
+int32_t dirwrite()
+{
+	return -1;
+}

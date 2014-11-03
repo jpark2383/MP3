@@ -66,11 +66,11 @@ int32_t rtc_close(int32_t fd){
 *   SIDE EFFECTS: None
 */ 
 int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
-	//printf("entering RTC_read... \n");
+	printf("entering RTC_read... \n");
 	intr_flag = 0;
 	while(intr_flag == 0);
 	
-	//printf("exitting RTC_read... \n");
+	printf("exitting RTC_read... \n");
 	return 0;
 }
 
@@ -88,14 +88,15 @@ int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
 
 	if (((const int32_t*)buf) == NULL)
 		return -1;
-	else if (nbytes != 4)
+	else if (nbytes != NBYTE_4)
 		return -1;
 		
 	int32_t intr_freq = *((const int32_t*)buf);
 	int32_t po2_flag = 0;
 	int32_t i;
 	
-	for (i = 2; i <= 1024; i *= 2){
+	for (i = 2; i <= POW2_MAX; i *= 2)
+	{
 		if (intr_freq == i)
 			po2_flag = 1;
 	}
@@ -156,7 +157,7 @@ void rtc_interrupt()
 	inb(RTC_DATA_PORT);					// throw away data contents
 
 	intr_flag++;						// clear 
-	//printf("intr_flag is: %d \n", intr_flag);
+//	printf("intr_flag is: %d \n", intr_flag);
 	
 	send_eoi(IRQ8); 					//Send EOIs
 	send_eoi(IRQ2);
