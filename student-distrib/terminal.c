@@ -112,29 +112,29 @@ void keyboard_read(unsigned char keystroke)
 			set_cursor(x + 1, y);
 		else if((x < counter) && (x == 79))
 			set_cursor(0, y + 1);
-	}*/
+	}
 	else if (keystroke == CTRL_C)
 	{
 		send_eoi(PIC_8);
-	}
-	else if(keystroke == CTRL_L)
+	}*/
+	else if(keystroke == CTRL_L) //ctrl + l clears the screen
 	{
 		clear();
 		set_cursor(0,0);
 	}
-	else if((x >= WIDTH - 1) || (keystroke == '\n'))
+	else if((x >= WIDTH - 1) || (keystroke == '\n')) // Case when we reach bottom of screen
 	{
-		unsigned char text_hist[HEIGHT][WIDTH];
+		unsigned char text_hist[HEIGHT][WIDTH]; //array to hold previous display
 		if(y >= HEIGHT - 1)
 		{
-			//printf("shift page\n");
+			//save the display
 			for(i = 0; i < HEIGHT; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
 			clear();
-			//set_cursor(0,0);
+			//shift the display up one position
 			for(i = 1; i < HEIGHT; i++)
 			{
 				set_cursor(0,i - 1);
@@ -144,8 +144,8 @@ void keyboard_read(unsigned char keystroke)
 				}
 			}
 		}
-		putc('\n');
-		if(keystroke == '\n')
+		putc('\n'); // Write the new line
+		if(keystroke == '\n') // This is when the key presses is actually \n
 		{
 			text_buf[counter] = keystroke;
 			counter = 0;
@@ -169,13 +169,14 @@ void keyboard_read(unsigned char keystroke)
 			send_eoi(PIC_1);
 			return;
 		}
-		setx(--x);
+		setx(--x); //These lines delete the character
 		putc(' ');
 		setx(x);
-		text_buf[counter] = NULL;
+		text_buf[counter] = NULL; //Remove char from buffer
 		set_cursor(x,y);
 		counter--;
 	}
+	// These are all the actual characters. Save to buffer and write to screen.
 	else if((keystroke >= ' ') && (keystroke <= '~') && (counter < BUF_MAX))
 	{
 		text_buf[counter] = keystroke;
@@ -198,7 +199,7 @@ void keyboard_read(unsigned char keystroke)
 
 int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 {
-	printf("read_helper called \n");
+	//printf("read_helper called \n");
 	if((fd == 1) || (buf == NULL) || (length < 0))
 		return -1;
 	while(1)
@@ -242,48 +243,27 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 
  int32_t write_helper(int32_t fd, const uint8_t* text, uint32_t length)
  {
- 	printf("write_helper called \n");
- 	int i, j, k;
- 	int x = getx();
- 	int y = gety();
+ 	//printf("write_helper called \n");
+ 	int i, j, k; //Counters
+ 	int x, y;
  	unsigned char text_hist[HEIGHT][WIDTH]; // In case new line goes offscreen
  	//check for valid inputs
  	if (text == NULL || length < 0 || fd ==0)
  		return -1;
  	for(k = 0; k < length; k++)
  	{
-		/*if(y >= HEIGHT - 1)
-		{
-			printf("line 256\n");
-			for(i = 0; i <= HEIGHT; i++)
-			{
-				for(j = 0; j < WIDTH; j++)
-					text_hist[i][j] = get_char(j, i);
-			}
-			clear();
-			set_cursor(0,0);
-			for(i = 1; i < HEIGHT; i++)
-			{
-				for(j = 0; j < WIDTH; j++)
-				{
-					set_cursor(0,i - 1);
-					putc(text_hist[i][j]);
-				}
-			}
-			set_cursor(0,y);
-		}*/
-		x = getx();
+		x = getx(); //Set x and y
 		y = gety();
-		if(y >= HEIGHT - 1)
+		if(y >= HEIGHT) //This is similar to the case in keyboard_read for page bottom
 		{
-			//printf("shift page\n");
+			
 			for(i = 0; i < HEIGHT; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
 			clear();
-			//set_cursor(0,0);
+			//shift the screen
 			for(i = 1; i < HEIGHT; i++)
 			{
 				set_cursor(0,i - 1);
@@ -294,17 +274,16 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 			}
 			set_cursor(0, HEIGHT - 1);
 		}
-		//putc('\n');
  		if(text[k] == NULL)
  		{
+ 			//Do nothing
  		}
  		else
  		{
- 			//printf("got here! \n");
- 			putc(text[k]);
+ 			putc(text[k]); //Print the character
  		}
  		if((x == WIDTH - 1) && (text[k + 1] != '\n'))
- 			putc('\n');
+ 			putc('\n'); //Newline at end of line
  	}
  	set_cursor(getx(), gety());
  	return i+1;
