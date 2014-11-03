@@ -97,7 +97,7 @@ int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
 	int32_t po2_flag = 0;
 	int32_t i;
 	
-	for (i = 2; i <= POW2_MAX; i *= 2)
+	for (i = RTC_MIN; i <= POW2_MAX; i *= RTC_MIN)
 	{
 		if (intr_freq == i)
 			po2_flag = 1;

@@ -20,7 +20,7 @@ int newline = 0;
 void set_cursor(int x, int y)
 {
 	uint32_t position = y*WIDTH + x;
-	outb(LOW_CURSOR_PORT, VGA_CMD);
+	outb(LOW_CURSOR_PORT, VGA_CMD); //outb to the vga register
 	outb((position & CURSOR_MASK), VGA_DATA);
 	outb(HIGH_CURSOR_PORT, VGA_CMD);
 	outb(((position>>SHIFT)&CURSOR_MASK), VGA_DATA);
@@ -44,7 +44,7 @@ int32_t terminal_open(const uint8_t *filename)
 	{
 		text_buf[i] = NULL;
 	}
-	counter = 0;
+	counter = 0; //initialize things
 	set_cursor(0,0);
 	enable_irq(PIC_1);
 	return 0;
@@ -88,7 +88,8 @@ void keyboard_read(unsigned char keystroke)
 		printf("    ");
 		set_cursor(x+4, y);
 	}
-	/*else if(keystroke == UP)
+	/* For another time
+	else if(keystroke == UP)
 	{
 		if(counter < 80)
 			set_cursor(0, y);
