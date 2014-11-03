@@ -191,7 +191,7 @@ entry (unsigned long magic, unsigned long addr)
 	//clear(); // Clears the screen before test_interrupts
 	//int x = 1/0;
 	// Tests for RTC
-	for(i = 0; i < 10000000; i++);
+	for(i = 0; i < 1000000000; i++);
 	rtc_read(0,0,0);
 	//int j = 1024;
 	//rtc_write(0,&j,4);
