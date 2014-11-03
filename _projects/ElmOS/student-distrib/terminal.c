@@ -243,23 +243,17 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 
  int32_t write_helper(int32_t fd, const uint8_t* text, uint32_t length)
  {
-<<<<<<< .mine
  	//printf("write_helper called \n");
  	int i, j, k;
  	int x = getx();
  	int y = gety();
-=======
- 	//printf("write_helper called \n");
- 	int i, j, k; //Counters
- 	int x, y;
->>>>>>> .r15285
+
  	unsigned char text_hist[HEIGHT][WIDTH]; // In case new line goes offscreen
  	//check for valid inputs
  	if (text == NULL || length < 0 || fd ==0)
  		return -1;
  	for(k = 0; k < length; k++)
  	{
-<<<<<<< .mine
 		/*if(y >= HEIGHT - 1)
 		{
 			printf("line 256\n");
@@ -281,15 +275,9 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 			set_cursor(0,y);
 		}*/
 		x = getx();
-=======
-		x = getx(); //Set x and y
->>>>>>> .r15285
+
 		y = gety();
-<<<<<<< .mine
-		if(y >= HEIGHT)
-=======
 		if(y >= HEIGHT) //This is similar to the case in keyboard_read for page bottom
->>>>>>> .r15285
 		{
 			
 			for(i = 0; i < HEIGHT; i++)
