@@ -18,7 +18,7 @@
 #define BUF_MIN				7
 
 extern void set_cursor(int x, int y);
-extern void keyboard_read();
+extern void keyboard_read(unsigned char keystroke);
 extern int32_t terminal_open(const uint8_t* filename);
 extern int32_t terminal_close(int32_t fd);
 extern int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t len);
