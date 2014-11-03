@@ -22,7 +22,8 @@
 #define RTC_MAX 1024
 #define IRQ2 0x02
 #define IRQ8 0x08
-
+#define POW2_MAX 1024
+#define NBYTE_4 4
 
 
 extern void rtc_init(); // Initilization of the RTC. Starts at 2

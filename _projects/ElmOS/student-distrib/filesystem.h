@@ -70,6 +70,6 @@ extern int32_t filesystem_open(const uint8_t* filename);
 extern int32_t filesystem_close(int32_t fd);
 extern int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes);
 extern int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes);
-
-
+extern int32_t dirread();
+extern int32_t dirwrite();
 #endif /* _FILESYSTEM_H */
