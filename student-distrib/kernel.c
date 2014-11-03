@@ -201,7 +201,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	/*testing open and read file*/
 	
-	uint8_t filename[] = ".";
+	uint8_t filename[] = "verylargetxtwithverylongname.tx";
 	uint8_t buffer[3000];
 	int res;
 	res = filesystem_open(filename);
