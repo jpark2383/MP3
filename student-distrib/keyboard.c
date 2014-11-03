@@ -53,6 +53,7 @@ unsigned char read_keyboard()
 {
 	uint8_t scancode = inb(KB_DATA);
 	unsigned char code = key_codes[scancode];
+	unsigned char charval;
 	if(scancode < KEY_PRESS)
 	{
 		//These are for setting the flags
@@ -60,59 +61,61 @@ unsigned char read_keyboard()
 		{
 			l_shift = 1;
 			shift_flag = 1;
-			return NULL;
+			charval = NULL;
 		}
-		if(code == RIGHT_SHIFT_PRESS)
+		else if(code == RIGHT_SHIFT_PRESS)
 		{
 			r_shift = 1;
 			shift_flag = 1;
-			return NULL;
+			charval = NULL;
 		}
-		if(code == ALT_PRESS)
+		else if(code == ALT_PRESS)
 		{
 			alt_flag = 1;
 			if(ctrl_flag)
-				return CTRL_ALT;
-			return NULL;
+				charval = CTRL_ALT;
+			else charval = NULL;
 		}
-		if(code == CTRL_PRESS)
+		else if(code == CTRL_PRESS)
+		{
 			ctrl_flag = 1;
-			return NULL;
-		if(code == CAPS)
+			charval = NULL;
+		}
+		else if(code == CAPS)
 		{
 			if(caps_flag == 1)
 				caps_flag = 0;
 			else
 				caps_flag = 1;
-			return NULL;
+			charval = NULL;
 		}
-		if((code >= '\'') && (code <= 'z'))
+		else if((code >= '\'') && (code <= 'z'))
 		{
 			if(ctrl_flag == 1)
 			{
 				switch(code){
-					case 'c': return CTRL_C;
-					case 'l': return CTRL_L;
+					case 'c': charval = CTRL_C;
+					case 'l': charval = CTRL_L;
 					default: break;
 				}
 			}
-			if((code <= 'z') && code >= 'a')
+			else if((code <= 'z') && code >= 'a')
 			{
 				if(shift_flag == caps_flag) // lowercase letter
-					return code;
+					charval = code;
 				else
-					return code - ('a' - 'A'); // uppercase letter
+					charval = code - ('a' - 'A'); // uppercase letter
 			}
-			if((code >= '\'' && code <= '@') || (code >= '[' && code <= '`'))
+			else if((code >= '\'' && code <= '@') || (code >= '[' && code <= '`'))
 			{
 				if(shift_flag)
-					return shift(code);
-				else return code;
+					charval = shift(code);
+				else charval = code;
 			}
-			return NULL;
+			else charval = NULL;
 		}
 		else
-			return code;
+			charval = code;
 	}
 	else
 	{
@@ -125,8 +128,9 @@ unsigned char read_keyboard()
 			ctrl_flag = 0;
 		if(scancode == ALT_RELEASE)
 			alt_flag = 0;
-		return NULL;
+		charval = NULL;
 	}
+	keyboard_read(charval);
 	send_eoi(PIC_1);
 	return NULL;
 }

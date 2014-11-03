@@ -9,6 +9,7 @@
 #include "lib.h"
 #include "types.h"
 #include "i8259.h"
+#include "terminal.h"
 
 #define BACKSPACE			8
 #define LEFT_SHIFT_PRESS	66

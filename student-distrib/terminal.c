@@ -73,21 +73,22 @@ int32_t terminal_close(int32_t fd)
  * SIDE EFFECTS: May print to the screen, move the cursor, delete characters, etc.
  */
 
-void keyboard_read()
+void keyboard_read(unsigned char keystroke)
 {
+	//printf("keyboard_read called \n");
 	int i, j;			//declare variables for counters
 	int x = getx();
 	int y = gety();
 	set_cursor(x,y);
 	uint8_t buf[BUF_MIN];
-	unsigned char keystroke = read_keyboard();
+	//unsigned char keystroke = read_keyboard();
 	//Condition: backspace
 	if(keystroke == '\t')
 	{
 		printf("    ");
 		set_cursor(x+4, y);
 	}
-	else if(keystroke == UP)
+	/*else if(keystroke == UP)
 	{
 		if(counter < 80)
 			set_cursor(0, y);
@@ -111,7 +112,7 @@ void keyboard_read()
 			set_cursor(x + 1, y);
 		else if((x < counter) && (x == 79))
 			set_cursor(0, y + 1);
-	}
+	}*/
 	else if (keystroke == CTRL_C)
 	{
 		send_eoi(PIC_8);
@@ -126,18 +127,19 @@ void keyboard_read()
 		unsigned char text_hist[HEIGHT][WIDTH];
 		if(y >= HEIGHT - 1)
 		{
-			for(i = 0; i <= HEIGHT; i++)
+			//printf("shift page\n");
+			for(i = 0; i < HEIGHT; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
 			clear();
-			set_cursor(0,0);
+			//set_cursor(0,0);
 			for(i = 1; i < HEIGHT; i++)
 			{
+				set_cursor(0,i - 1);
 				for(j = 0; j < WIDTH; j++)
 				{
-					set_cursor(0,i - 1);
 					putc(text_hist[i][j]);
 				}
 			}
@@ -149,11 +151,11 @@ void keyboard_read()
 			counter = 0;
 			newline = 1;
 		}
-		set_cursor(0, y);
+		//set_cursor(0, y + 1);
 	}
 	else if(keystroke == BACKSPACE)
 	{
-		if(!newline) // If line already empty
+		if(newline) // If line already empty
 		{
 			send_eoi(PIC_1);
 			return;
@@ -178,7 +180,7 @@ void keyboard_read()
 	{
 		text_buf[counter] = keystroke;
 		putc(keystroke);
-		set_cursor(x + 1, y);
+		//set_cursor(x + 1, y);
 		counter ++;
 	}
 	return;
@@ -196,12 +198,15 @@ void keyboard_read()
 
 int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 {
+	printf("read_helper called \n");
 	if((fd == 1) || (buf == NULL) || (length < 0))
 		return -1;
 	while(1)
 	{
+		//printf("got to line 205\n");
 		if(newline == 1)
 		{
+			//printf("got to line 208\n");
 			int i = 0;
 			int ret_val;
 			//clear the buffer
@@ -237,6 +242,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 
  int32_t write_helper(int32_t fd, const uint8_t* text, uint32_t length)
  {
+ 	printf("write_helper called \n");
  	int i = 0;
  	int j = 0;
  	int k = 0;
@@ -250,6 +256,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  	{
 		if(y >= HEIGHT - 1)
 		{
+			printf("line 256\n");
 			for(i = 0; i <= HEIGHT; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
@@ -272,6 +279,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  		}
  		else
  		{
+ 			//printf("got here! \n");
  			putc(text[k]);
  		}
  		if((x == WIDTH - 1) && (text[k + 1] != '\n'))
