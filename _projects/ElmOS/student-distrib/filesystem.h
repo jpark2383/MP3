@@ -5,6 +5,11 @@
 #include "lib.h"
 #include "pagefile.h"
 
+
+#define BYTES_4 1
+#define BYTES_8 2
+#define BYTES_32 8
+#define BYTES_64 16
 #define MAX_FILE 62
 #define B_4 4
 #define B_8 8 
