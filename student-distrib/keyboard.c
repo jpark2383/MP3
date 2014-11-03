@@ -1,68 +1,132 @@
-/* keyboard.c - Functions to interact with the keyboard
- * vim:ts=4 noexpandtab
- */
-
 #include "keyboard.h"
 
+// flags for shift, alt, caps, etc.
+int shift_flag, alt_flag, caps_flag, ctrl_flag, l_shift, r_shift;
 // handle numbers and lower case letters 
 unsigned char key_codes[90] = {
 0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 
-	8,		//backspace
+	BACKSPACE,
 	'\t',		//tab
 	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 
-	65,			//control
+	CTRL_PRESS,			//control
 	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 
-	66, 			//left shift
+	LEFT_SHIFT_PRESS, 			//left shift
 	'\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 
-	67,			//right shift
-	'*',
-	68, 			//alt
-	' ',		//space bar
-	69,			//caps lock
-	70,			//59 - f1 key
-	71, 72, 73, 74, 75, 76, 77, 78, 
-	79,			//F10
-	80,			//num lock
-	81,			//scroll lock
-	82,			//homekey
-	83,			//up arrow
-	84,			//page up
-	'-',
-	85,			//left arrow
-	86,			
-	87,			//right arrow
-	'+',
-	88,			//end key
-	89,			//down arrow
-	90,			//page down
-	91,			//insert key
-	92,			//delete key
-	93,			
-	94,
-	95,
-	33,			//F11 key
-	34,			//F12 key
-	35,			//undefined
+	RIGHT_SHIFT_PRESS, '*', ALT_PRESS,' ', CAPS,
+	F1, F2, F3, F4, F5, F6, F7, F8, F9, F10,	//F1 - F10
+	NUM_LOCK, SCROLL_LOCK, HOME, UP, PAGE_UP, '-', LEFT,
+	86, RIGHT, '+', END, DOWN, PAGE_DOWN, INSERT,	DELETE,
+	93, 94, 95, // Unknown
+	F11, F12,	//F11-12 key
+	35, 	//undefined
 	};
 
-	/*
-* read_keyboard
-*   DESCRIPTION: Read scancode from keyboard's data port and translate it into char
-*   INPUTS: None
-*   OUTPUTS: None
-*   RETURN VALUE: None
-*   SIDE EFFECTS: Sends EOI to corresponding PIC
-*/ 
-void read_keyboard()
+unsigned char shift(unsigned char c)
 {
-	unsigned char code;
-	uint8_t scancode = inb(keyboard_rw_port);
-	code = key_codes[scancode];
-	if(scancode < valid_kb_press)
-	{
-		putc(code);
-		send_eoi(1);
-		return;
+	switch(c){
+		case '`': return '~';
+		case '1': return '!';
+		case '2': return '@';
+		case '3': return '#';
+		case '4': return '$';
+		case '5': return '%';
+		case '6': return '^';
+		case '7': return '&';
+		case '8': return '*';
+		case '9': return '(';
+		case '0': return ')';
+		case '-': return '_';
+		case '=': return '+';
+		case '[': return '{';
+		case ']': return '}';
+		case '\\': return '|';
+		case ';': return ':';
+		case '\'': return '"';
+		case ',': return '<';
+		case '.': return '>';
+		case '/': return '?';
+		default: return c;
 	}
-	send_eoi(1);
+}
+
+unsigned char read_keyboard()
+{
+	uint8_t scancode = inb(KB_DATA);
+	unsigned char code = key_codes[scancode];
+	if(scancode < KEY_PRESS)
+	{
+		//These are for setting the flags
+		if(code == LEFT_SHIFT_PRESS)
+		{
+			l_shift = 1;
+			shift_flag = 1;
+			return NULL;
+		}
+		if(code == RIGHT_SHIFT_PRESS)
+		{
+			r_shift = 1;
+			shift_flag = 1;
+			return NULL;
+		}
+		if(code == ALT_PRESS)
+		{
+			alt_flag = 1;
+			if(ctrl_flag)
+				return CTRL_ALT;
+			return NULL;
+		}
+		if(code == CTRL_PRESS)
+			ctrl_flag = 1;
+			return NULL;
+		if(code == CAPS)
+		{
+			if(caps_flag == 1)
+				caps_flag = 0;
+			else
+				caps_flag = 1;
+			return NULL;
+		}
+		if((code >= '\'') && (code <= 'z'))
+		{
+			if(ctrl_flag == 1)
+			{
+				switch(code){
+					case 'c': return CTRL_C;
+					case 'l': return CTRL_L;
+					default: break;
+				}
+			}
+			if((code <= 'z') && code >= 'a')
+			{
+				if(shift_flag == caps_flag) // lowercase letter
+					return code;
+				else
+					return code - ('a' - 'A'); // uppercase letter
+			}
+			if((code >= '\'' && code <= '@') || (code >= '[' && code <= '`'))
+			{
+				if(shift_flag)
+					return shift(code);
+				else return code;
+			}
+			return NULL;
+		}
+		else
+			return code;
+	}
+	else
+	{
+		if(scancode == LEFT_SHIFT_R)
+			l_shift = 0;
+		if(scancode == RIGHT_SHIFT_R)
+			r_shift = 0;
+		shift_flag = l_shift | r_shift;
+		if(scancode == CTRL_RELEASE)
+			ctrl_flag = 0;
+		if(scancode == ALT_RELEASE)
+			alt_flag = 0;
+		return NULL;
+	}
+	send_eoi(PIC_1);
+	return NULL;
 }
