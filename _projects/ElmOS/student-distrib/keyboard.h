@@ -53,6 +53,6 @@
 #define KB_DATA 			0x60
 #define KEYBOARD_CMD_PORT   0x64
 #define KEY_PRESS		0x80
-extern unsigned char read_keyboard();
-unsigned char shift(unsigned char c);
+extern unsigned char read_keyboard(); //Interrupt handler for the keyboard
+unsigned char shift(unsigned char c); //For the shift key
 #endif

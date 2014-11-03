@@ -17,14 +17,14 @@
 #define BUF_MAX				128
 #define BUF_MIN				7
 
-extern void set_cursor(int x, int y);
-extern void keyboard_read(unsigned char keystroke);
-extern int32_t terminal_open(const uint8_t* filename);
-extern int32_t terminal_close(int32_t fd);
-extern int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t len);
-extern int32_t terminal_write(int32_t fd, const uint8_t *buf, uint32_t len);
+extern void set_cursor(int x, int y); //Sets the cursor
+extern void keyboard_read(unsigned char keystroke); //Parses whatever comes form the keyboard
+extern int32_t terminal_open(const uint8_t* filename); //Opens the terminal
+extern int32_t terminal_close(int32_t fd); //Closes the terminal
+extern int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t len); //Read from the terminal
+extern int32_t terminal_write(int32_t fd, const uint8_t *buf, uint32_t len); //Write to the terminal
 
-int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length);
-int32_t write_helper(int32_t fd, const uint8_t *text, uint32_t length);
+int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length); //Slave to the read function
+int32_t write_helper(int32_t fd, const uint8_t *text, uint32_t length); //More slaves!
 
 #endif

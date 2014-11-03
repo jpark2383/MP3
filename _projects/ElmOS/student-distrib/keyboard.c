@@ -21,6 +21,13 @@ unsigned char key_codes[90] = {
 	35, 	//undefined
 	};
 
+/*
+ * shift(unsigned char c)
+ * applies shift key to characters
+ * INPUT: unsigned char c: character to be shifted
+ * RETURN: shifted character
+ * SIDE EFFECTS: None
+ */
 unsigned char shift(unsigned char c)
 {
 	switch(c){
@@ -49,6 +56,14 @@ unsigned char shift(unsigned char c)
 	}
 }
 
+/*
+ * read_keyboard
+ * interrupt handler for the keyboard
+ * INPUT: none
+ * OUTPUT: NONE
+ * RETURN: NULL to indicate success
+ * SIDE EFFECTS: Handles keyboard, may write to terminal, and sends EOI
+ */
 unsigned char read_keyboard()
 {
 	uint8_t scancode = inb(KB_DATA);
