@@ -1,6 +1,5 @@
 #include "filesystem.h"
 
-
 /* 
  * filesystem_init
  *   DESCRIPTION: Initializes the filesystem driver
@@ -35,6 +34,7 @@ int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry)
 		if(strncmp((const int8_t*)fname, (const int8_t*)file_num, B_32) ==0)
 		{	
 			memcpy(dentry, (filesystem.dentry_begin + i*B_64), B_40);
+			printf("inode is %d", dentry->inode_number);
 			return 0;
 		}
 	}
@@ -74,19 +74,23 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 	uint32_t block_number = *(inode_ptr + ((num_block +1) *B_4));
 	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*KB_4));
 	uint8_t * temp_buf = buf;
+	int i;
 	
 	// clears the buffer
-	memcpy(buf, 0, length);
-	
+	for(i = 0; i < length; i++)
+	{
+		buf[i] = 0;
+		
+	}
 	//checks if inode index is valid
 	if(inode < 0 || inode >= (filesystem.num_inodes - 1))
 	{
 		return -1;
 	}
-	//checks if offset is valid
+	//checks if the entire data is being read
 	if (offset >= data_length)
 	{
-		return -1;
+		return 0;
 	}
 	
 	// This may or may not be right
@@ -136,4 +140,67 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 	return ret_val;
 	
 }
+
+/* 
+ * filesystem_open
+ *   DESCRIPTION: filesytem's open function
+ *   INPUTS: filename
+ *   RETURN VALUE: 0 if successful, -1 if fail
+ *   SIDE EFFECTS: sets up the global dentry to enable read/write
+ */
+int32_t filesystem_open(const uint8_t* filename)
+{
+	if((strncmp((const int8_t*)filename, (const int8_t*)"" , 1)) != 0)
+		return read_dentry_by_name(filename, &dentry[0]);
+	else
+		return -1;
+}
+
+/* 
+ * filesystem_close
+ *   DESCRIPTION: filesytem's close function
+ *   INPUTS: fd
+ *   RETURN VALUE: 0 
+ *   SIDE EFFECTS: closes the opened file
+ */
+int32_t filesystem_close(int32_t fd)
+{
+	return 0;
+}
+
+/* 
+ * filesystem_read
+ *   DESCRIPTION: filesytem's read function
+ *   INPUTS: fd,buffer to write read data to, #of bytes to read	
+ *   RETURN VALUE: #bytes is successful if successful, -1 if fail
+ *   SIDE EFFECTS: reads the data
+ */
+int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes)
+{
+	return read_data(dentry[fd].inode_number, 0, buf, nbytes);
+}
+ /* 
+ * filesystem_write	
+ *   DESCRIPTION: filesytem's write function
+ *   INPUTS: fd,buffer to write data to, #of bytes to read	
+ *   RETURN VALUE: -1 as it is a read-only file system
+ *   SIDE EFFECTS: does nothing
+ */
+int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes)
+{
+    return -1;
+}
+
+int32_t diropen(const uint8_t* filename)
+{
+    
+    return 0;
+}
+
+int32_t dirclose(int32_t fd)
+{
+    return 0;
+    
+}
+
 

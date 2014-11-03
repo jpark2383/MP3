@@ -9,6 +9,7 @@
 #include "i8259.h"
 #include "debug.h"
 #include "keyboard.h"
+#include "filesystem.h"
 #include "rtc.h"
 #include "pagefile.h"
 
@@ -56,10 +57,12 @@ entry (unsigned long magic, unsigned long addr)
 		int mod_count = 0;
 		int i;
 		module_t* mod = (module_t*)mbi->mods_addr;
+		BOOT_BLOCK_PTR = (uint32_t *)mod->mod_start;
 		while(mod_count < mbi->mods_count) {
 			printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
 			printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
 			printf("First few bytes of module:\n");
+			
 			for(i = 0; i<16; i++) {
 				printf("0x%x ", *((char*)(mod->mod_start+i)));
 			}
@@ -163,6 +166,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * PIC, any other initialization stuff... */\
 	paging_init();	
 	rtc_init();
+	init_fs();
 	enable_irq(PIC_1);
 
 	/* Enable interrupts */
@@ -171,10 +175,21 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
-	clear(); // Clears the screen before test_interrupts
+	//clear(); // Clears the screen before test_interrupts
 	//int x = 1/0;
-	
-
+	/*
+	uint8_t filename[] = "frame1.txt";
+	uint8_t buffer[500];
+	int res;
+	res = filesystem_open(filename);
+	if(res == -1)
+		printf("asdasd");
+	filesystem_read(0, buffer, 5);
+	for(i = 0; i < 5; i++)
+	{
+		printf("%c", buffer[i]);
+	}
+	*/
 	/* Execute the first program (`shell') ... */
 
 	/* Spin (nicely, so we don't chew up cycles) */
