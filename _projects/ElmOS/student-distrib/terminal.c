@@ -243,9 +243,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  int32_t write_helper(int32_t fd, const uint8_t* text, uint32_t length)
  {
  	printf("write_helper called \n");
- 	int i = 0;
- 	int j = 0;
- 	int k = 0;
+ 	int i, j, k;
  	int x = getx();
  	int y = gety();
  	unsigned char text_hist[HEIGHT][WIDTH]; // In case new line goes offscreen
@@ -294,8 +292,9 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 					putc(text_hist[i][j]);
 				}
 			}
+			set_cursor(0, HEIGHT - 1);
 		}
-		putc('\n');
+		//putc('\n');
  		if(text[k] == NULL)
  		{
  		}
@@ -305,7 +304,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  			putc(text[k]);
  		}
  		if((x == WIDTH - 1) && (text[k + 1] != '\n'))
- 			set_cursor(x, ++y);
+ 			putc('\n');
  	}
  	set_cursor(getx(), gety());
  	return i+1;
