@@ -10,6 +10,7 @@
 #define BYTES_8 2
 #define BYTES_32 8
 #define BYTES_64 16
+#define BYTES_4K 1024
 #define MAX_FILE 62
 #define B_4 4
 #define B_8 8 
@@ -17,11 +18,6 @@
 #define B_36 36
 #define B_40 40
 #define B_64 64
-
-
-
-
-
 
 typedef struct dentry
 {
