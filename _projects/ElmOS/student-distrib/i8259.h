@@ -38,6 +38,20 @@
 #define ALL_MASK 		0xFF
 #define LONG_MASK 		0xFF00
 #define PIC_1 			0x01
+#define PIC_2 			0x02
+#define PIC_3 			0x03
+#define PIC_4 			0x04
+#define PIC_5 			0x05
+#define PIC_6 			0x06
+#define PIC_7 			0x07
+#define PIC_8 			0x08
+#define PIC_9 			0x09
+#define PIC_10 			0x010
+#define PIC_11 			0x011
+#define PIC_12			0x012
+#define PIC_13			0x013
+#define PIC_14			0x014
+#define PIC_15 			0x015
 /* Externally-visible functions */
 
 /* Initialize both PICs */

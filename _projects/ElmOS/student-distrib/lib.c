@@ -12,6 +12,34 @@ static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
 
+
+
+//get the x location of the screen
+int getx()
+{
+	return screen_x;
+}
+//get the y location of the screen
+int gety()
+{
+	return screen_y;
+}
+//set the x location to the screen
+void setx(int x)
+{
+	screen_x = x;
+}
+//set y lcoation to the screen
+void sety(int y)
+{
+	screen_y = y;
+}
+//get the char at the location
+unsigned char get_char(int x, int y)
+{
+	return *(uint8_t *)(video_mem + ((NUM_COLS*y + x) << 1));
+}
+
 /*
 * void clear(void);
 *   Inputs: void
