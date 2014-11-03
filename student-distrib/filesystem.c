@@ -10,10 +10,10 @@
 void init_fs()
 {
    filesystem.num_dir_entries = *(BOOT_BLOCK_PTR);
-   filesystem.num_inodes = *(BOOT_BLOCK_PTR + B_4);
-   filesystem.num_data_blocks = *(BOOT_BLOCK_PTR + B_8);
-   filesystem.dentry_begin = (uint8_t *)(BOOT_BLOCK_PTR + B_64);
-   filesystem.data_start = BOOT_BLOCK_PTR + (filesystem.num_inodes+1)*KB_4;
+   filesystem.num_inodes = *(BOOT_BLOCK_PTR + BYTES_4);
+   filesystem.num_data_blocks = *(BOOT_BLOCK_PTR + BYTES_8);
+   filesystem.dentry_begin = (uint8_t *)(BOOT_BLOCK_PTR + BYTES_64);
+   filesystem.data_start = BOOT_BLOCK_PTR + (filesystem.num_inodes+1)*1024;
 }
 
 
@@ -27,11 +27,11 @@ void init_fs()
 int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry)
 {
 	int i;
-	uint8_t file_num[B_32];
+	uint8_t file_name[B_32];
 	for(i = 0; i < MAX_FILE; i++)
 	{
-		memcpy(file_num, (filesystem.dentry_begin + i*B_64), B_32);
-		if(strncmp((const int8_t*)fname, (const int8_t*)file_num, B_32) ==0)
+		memcpy(file_name, (filesystem.dentry_begin + i*B_64), B_32);
+		if(strncmp((const int8_t*)fname, (const int8_t*)file_name, B_32) ==0)
 		{	
 			memcpy(dentry, (filesystem.dentry_begin + i*B_64), B_40);
 			printf("inode is %d", dentry->inode_number);
@@ -69,10 +69,10 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 	uint32_t ret_val, remaining;
 	int num_block = offset/KB_4;
 	int block_index = offset % KB_4;
-	uint32_t *inode_ptr = BOOT_BLOCK_PTR + (inode+1)*KB_4;
+	uint32_t *inode_ptr = BOOT_BLOCK_PTR + (inode+1)*1024;
 	uint32_t data_length = *inode_ptr;
-	uint32_t block_number = *(inode_ptr + ((num_block +1) *B_4));
-	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*KB_4));
+	uint32_t block_number = *(inode_ptr + ((num_block +1) *BYTES_4));
+	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*1024));
 	uint8_t * temp_buf = buf;
 	int i;
 	
