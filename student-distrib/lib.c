@@ -14,27 +14,63 @@ static char* video_mem = (char *)VIDEO;
 
 
 
-//get the x location of the screen
+/*
+* int getx();
+*   Inputs: none
+*   Return Value: screen_x
+*	Function: returns x position of cursor
+*/
 int getx()
 {
 	return screen_x;
 }
-//get the y location of the screen
+/*
+* int gety();
+*   Inputs: none
+*   Return Value: screen_y
+*	Function: returns y position of cursor
+*/
 int gety()
 {
 	return screen_y;
 }
-//set the x location to the screen
+/*
+* int setx();
+*   Inputs: int x
+*   Return Value: none
+*	Function: sets x position of cursor
+*/
 void setx(int x)
 {
 	screen_x = x;
 }
-//set y lcoation to the screen
+/*
+* int sety();
+*   Inputs: int y
+*   Return Value: none
+*	Function: sets y position of cursor
+*/
 void sety(int y)
 {
 	screen_y = y;
 }
-//get the char at the location
+/*
+* int setxy(int x, int y);
+*   Inputs: int x, int y : coordinates to set
+*   Return Value: none
+*	Function: sets x and y positions of cursor
+*/
+void setxy(int x, int y)
+{
+	screen_x = x;
+	screen_y = y;
+}
+/*
+* int get_char();
+*   Inputs: int x, int y: coordinates
+*   Return Value: unsigned char: character at the coordinates
+*	Function: Finds character at certain position
+*/
 unsigned char get_char(int x, int y)
 {
 	return *(uint8_t *)(video_mem + ((NUM_COLS*y + x) << 1));

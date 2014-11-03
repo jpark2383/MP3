@@ -11,6 +11,8 @@
 #include "i8259.h"
 #include "terminal.h"
 
+// These are a bunch of values for the keyboard when the button 
+// pressed is not a printable character.
 #define BACKSPACE			8
 #define LEFT_SHIFT_PRESS	66
 #define RIGHT_SHIFT_PRESS	67

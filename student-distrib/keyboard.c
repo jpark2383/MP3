@@ -72,31 +72,31 @@ unsigned char read_keyboard()
 	if(scancode < KEY_PRESS)
 	{
 		//These are for setting the flags
-		if(code == LEFT_SHIFT_PRESS)
+		if(code == LEFT_SHIFT_PRESS) //On left shift press
 		{
 			l_shift = 1;
 			shift_flag = 1;
 			charval = NULL;
 		}
-		else if(code == RIGHT_SHIFT_PRESS)
+		else if(code == RIGHT_SHIFT_PRESS) //On right shift press
 		{
 			r_shift = 1;
 			shift_flag = 1;
 			charval = NULL;
 		}
-		else if(code == ALT_PRESS)
+		else if(code == ALT_PRESS) //On alt press
 		{
 			alt_flag = 1;
 			if(ctrl_flag)
 				charval = CTRL_ALT;
 			else charval = NULL;
 		}
-		else if(code == CTRL_PRESS)
+		else if(code == CTRL_PRESS) //On control press
 		{
 			ctrl_flag = 1;
 			charval = NULL;
 		}
-		else if(code == CAPS)
+		else if(code == CAPS) //On caps lock press
 		{
 			if(caps_flag == 1)
 				caps_flag = 0;
@@ -104,23 +104,24 @@ unsigned char read_keyboard()
 				caps_flag = 1;
 			charval = NULL;
 		}
-		else if((code >= '\'') && (code <= 'z'))
+		else if((code >= '\'') && (code <= 'z')) // If it is a character
 		{
-			if(ctrl_flag == 1)
+			if(ctrl_flag == 1) // control is pressed
 			{
 				switch(code){
-					case 'c': charval = CTRL_C;
-					case 'l': charval = CTRL_L;
+					case 'c': charval = CTRL_C; //Doesn't matter right now
+					case 'l': charval = CTRL_L; //Special CTRL_L value
 					default: break;
 				}
 			}
-			else if((code <= 'z') && code >= 'a')
+			else if((code <= 'z') && code >= 'a') //If it is a letter
 			{
 				if(shift_flag == caps_flag) // lowercase letter
 					charval = code;
 				else
 					charval = code - ('a' - 'A'); // uppercase letter
 			}
+			//If not a letter
 			else if((code >= '\'' && code <= '@') || (code >= '[' && code <= '`'))
 			{
 				if(shift_flag)
@@ -134,14 +135,14 @@ unsigned char read_keyboard()
 	}
 	else
 	{
-		if(scancode == LEFT_SHIFT_R)
+		if(scancode == LEFT_SHIFT_R) // On left shift release
 			l_shift = 0;
-		if(scancode == RIGHT_SHIFT_R)
+		if(scancode == RIGHT_SHIFT_R) // On right shift release
 			r_shift = 0;
 		shift_flag = l_shift | r_shift;
-		if(scancode == CTRL_RELEASE)
+		if(scancode == CTRL_RELEASE) // On ctrl release
 			ctrl_flag = 0;
-		if(scancode == ALT_RELEASE)
+		if(scancode == ALT_RELEASE) // On alt release
 			alt_flag = 0;
 		charval = NULL;
 	}
