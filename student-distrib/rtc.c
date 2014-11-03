@@ -60,7 +60,9 @@ int32_t rtc_close(int32_t fd){
 /*
 * rtc_read
 *   DESCRIPTION: 
-*   INPUTS: None
+*   INPUTS: fd - file descriptor
+*			buf - buffer pointer
+*			nbytes - number of bytes
 *   OUTPUTS: None
 *   RETURN VALUE: None
 *   SIDE EFFECTS: None
@@ -115,7 +117,7 @@ int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
 *   INPUTS: None
 *   OUTPUTS: None
 *   RETURN VALUE: None
-*   SIDE EFFECTS:
+*   SIDE EFFECTS: sets interrupt frequency
 */ 
 void rtc_set(int32_t freq)
 {
