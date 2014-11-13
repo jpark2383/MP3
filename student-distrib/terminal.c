@@ -6,7 +6,7 @@
 //declare arrays and variabls for text, history, counter, newline detector
 unsigned char text_buf[BUF_MAX];
 unsigned int counter;
-int newline = 0;
+//int newline = 0;
 
 /*
  * set_cursor
@@ -150,17 +150,17 @@ void keyboard_read(unsigned char keystroke)
 		{
 			text_buf[counter] = keystroke;
 			counter = 0;
-			newline = 1;
+			//newline = 1;
 		}
 		//set_cursor(0, y + 1);
 	}
 	else if(keystroke == BACKSPACE)
 	{
-		if(newline) // If line already empty
+		/*if(newline) // If line already empty
 		{
 			send_eoi(PIC_1);
 			return;
-		}
+		}*/
 		for(i = 0; i < BUF_MIN; i++)
 		{
 			buf[i] = get_char(i, y);
@@ -172,10 +172,10 @@ void keyboard_read(unsigned char keystroke)
 		}
 		setx(--x); //These lines delete the character
 		putc(' ');
-		setx(x);
-		text_buf[counter] = NULL; //Remove char from buffer
+		//setx(x);
+		text_buf[--counter] = NULL; //Remove char from buffer
 		set_cursor(x,y);
-		counter--;
+		//counter--;
 	}
 	// These are all the actual characters. Save to buffer and write to screen.
 	else if((keystroke >= ' ') && (keystroke <= '~') && (counter < BUF_MAX))
@@ -198,16 +198,16 @@ void keyboard_read(unsigned char keystroke)
  * RETURN: display_terminal number
  */
 
-int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
+int32_t read_helper(uint8_t *buf, uint32_t length)
 {
 	//printf("read_helper called \n");
-	if((fd == 1) || (buf == NULL) || (length < 0))
-		return -1;
+	//if((fd == 1) || (buf == NULL) || (length < 0))
+	//	return -1;
 	while(1)
 	{
 		//printf("got to line 205\n");
-		if(newline == 1)
-		{
+		/*if(newline == 1)
+		{*/
 			//printf("got to line 208\n");
 			int i = 0;
 			int ret_val;
@@ -226,9 +226,9 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 				}
 			}
 			// reset keys entered
-			newline = 0;
+			//newline = 0;
 			return ret_val;
-		}
+		//}
 	}
 }
 
@@ -242,7 +242,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  * RETURN: display_terminal number
  */
 
- int32_t write_helper(int32_t fd, const uint8_t* text, uint32_t length)
+ int32_t write_helper(const uint8_t* text, uint32_t length)
  {
  	//printf("write_helper called \n");
  	int i, j, k;
@@ -251,7 +251,7 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
 
  	unsigned char text_hist[HEIGHT][WIDTH]; // In case new line goes offscreen
  	//check for valid inputs
- 	if (text == NULL || length < 0 || fd ==0)
+ 	if (text == NULL || length < 0)
  		return -1;
  	for(k = 0; k < length; k++)
  	{
@@ -320,9 +320,9 @@ int32_t read_helper(int32_t fd, uint8_t *buf, uint32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_write(int32_t fd, const uint8_t *text, uint32_t length)
+int32_t terminal_write(const uint8_t *text, uint32_t length)
 {
-	return write_helper(fd, text, length);
+	return write_helper(text, length);
 }
 
 /*
@@ -332,7 +332,7 @@ int32_t terminal_write(int32_t fd, const uint8_t *text, uint32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t length)
+int32_t terminal_read(uint8_t *buf, uint32_t length)
 {
-	return read_helper(fd, buf, length);
+	return read_helper(buf, length);
 }

@@ -201,17 +201,17 @@ entry (unsigned long magic, unsigned long addr)
 
 	/*testing open and read file*/
 	
-	uint8_t filename[] = "verylargetxtwithverylongname.tx";
+	/*uint8_t filename[] = "verylargetxtwithverylongname.tx";
 	uint8_t buffer[3000];
 	int res;
 	res = filesystem_open(filename);
 	if(res == -1)
-		terminal_write(1, (const uint8_t *)"not able to open the file", 200);
+		terminal_write((const uint8_t *)"not able to open the file", 200);
 	else
 	{
 		filesystem_read(0, buffer, 3000);
-			terminal_write(1, buffer, 3000);
-    }
+			terminal_write(buffer, 3000);
+    }*/
 	
 	
 	/*testing read directory*/
