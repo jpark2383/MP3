@@ -15,6 +15,7 @@
 #define B_4 4
 #define B_8 8 
 #define B_32 32
+#define B_24 24
 #define B_36 36
 #define B_40 40
 #define B_64 64
