@@ -124,3 +124,46 @@ _page_table:
 	.rept NUM_ENTRIES_PT
 	.long 0
 	.endr
+.align 4096
+task1_page_directory:
+_task1_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task2_page_directory:
+_task2_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task3_page_directory:
+_task3_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+		
+.align 4096
+task4_page_directory:
+_task4_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+		
+.align 4096
+task5_page_directory:
+_task5_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task6_page_directory:
+_task6_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+	

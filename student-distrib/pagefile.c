@@ -1,4 +1,5 @@
 #include "pagefile.h"
+#include "x86_desc.h"
 /*
 
 This function initializes paging  by setting the right entries for each of page table , sets the registers
@@ -20,6 +21,13 @@ void paging_init()
 	for(i = 0; i < NUM_ENTRIES_PD; i++)  //initialize entries
 	{
 		page_directory[i] = EMPTY;
+		/*
+		page_directory_task1[i]= EMPTY;
+		page_directory_task2[i]= EMPTY;
+		page_directory_task3[i]= EMPTY;
+		page_directory_task4[i]= EMPTY;
+		page_directory_task5[i]= EMPTY;
+		page_directory_task6[i]= EMPTY;*/
 	}
 	
 	for(i = 1; i < NUM_ENTRIES_PT; i++)  //initialize entries
