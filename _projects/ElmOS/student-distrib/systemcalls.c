@@ -4,7 +4,7 @@
 #include "filesystem.h"
 #include "lib.h"
 #include "x86_desc.h"
-
+#include "pagefile.h"
 int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 fops_t terminal_fops = {&terminal_open,&terminal_read,&terminal_write,&terminal_close};
@@ -18,9 +18,9 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  * RETURN: open a new fd
  */
  
- int32_t open (const uint8_t* filename)
+ int32_t syscall_open (const uint8_t* filename)
  {
-	int full = 1;
+	int taken = 1;
 	int pid = 0;
 	pid = find_pid();
 	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*pid - START);
@@ -34,7 +34,7 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
 	{
 		if(pcblock.file_struct[fd_index].flags == 0)
 		{
-			full = 0;
+			taken = 0;
 			break;
 		}
 	}
@@ -75,7 +75,7 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  * RETURN: close a fd. 
  */
  
- int32_t close (int32_t fd)
+ int32_t syscall_close (int32_t fd)
  {
 	int i;
 	// check for valid file descriptor
@@ -117,31 +117,33 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  }
  
  /*
- * get_pid
+ * find_pid
  * get the pid number of the current process
  * INPUT: NONE
  * OUTPUT: wpid number
  * RETURN: NONE
  */ 
  //This needs to be changed
+
  int find_pid()
  {
 		uint32_t cr3;
 		asm volatile ("mov %%CR3, %0": "=b"(cr3));
 		if(cr3==(uint32_t)page_directory)
 			return 0;
-		if(cr3==(uint32_t)page_directory_task1)
+		if(cr3==(uint32_t)task1_page_directory)
 			return 1;
-		if(cr3==(uint32_t)page_directory_task2)
+		if(cr3==(uint32_t)task2_page_directory)
 			return 2;
-		if(cr3==(uint32_t)page_directory_task3)
+		if(cr3==(uint32_t)task3_page_directory)
 			return 3;
-		if(cr3==(uint32_t)page_directory_task4)
+		if(cr3==(uint32_t)task4_page_directory)
 			return 4;
-		if(cr3==(uint32_t)page_directory_task5)
+		if(cr3==(uint32_t)task5_page_directory)
 			return 5;
-		if(cr3==(uint32_t)page_directory_task6)
+		if(cr3==(uint32_t)task6_page_directory)
 			return 6;
 		return -1;
  }
- 
+
+
