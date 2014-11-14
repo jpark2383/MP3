@@ -204,7 +204,6 @@ int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes)
 
 int32_t diropen(const uint8_t* filename)
 {
-    
     return 0;
 }
 
