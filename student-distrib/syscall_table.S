@@ -21,6 +21,12 @@ syscall_handler:
 	pushl %edx
 	pushl %esi
 	
+	/* what is this part */
+	pushl %eax
+	movw $0x18, %ax
+	movw %ax, %ds
+	popl %eax
+	
 	/* validity check on system call number */
 	cmpl $0, %eax
 	jbe  invalid_sysno
@@ -45,7 +51,7 @@ exit:
 	popl %ds
 	popl %es
 	addl $4, %esp
-	iret
+	iret				/* interrupt return */
 
 
 /* jump table for system calls */
