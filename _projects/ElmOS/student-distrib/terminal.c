@@ -320,8 +320,9 @@ int32_t read_helper(uint8_t *buf, uint32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_write(const uint8_t *buf, uint32_t len)
+int32_t terminal_write(int32_t fd, const uint8_t *buf, uint32_t len)
 {
+	if (fd == 0) return -1
 	return write_helper(buf, len);
 }
 
@@ -332,7 +333,8 @@ int32_t terminal_write(const uint8_t *buf, uint32_t len)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_read(uint8_t *buf, uint32_t len)
+int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t len)
 {
+	if (fd == 1) return -1
 	return read_helper(buf, len);
 }
