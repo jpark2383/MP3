@@ -13,6 +13,7 @@
 #include "rtc.h"
 #include "pagefile.h"
 #include "terminal.h"
+#include "systemcalls.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -170,7 +171,7 @@ entry (unsigned long magic, unsigned long addr)
 	rtc_init();
 	init_fs();
 	enable_irq(PIC_1);
-	//terminal_open(0);
+	terminal_open(0);
 	clear();
 
 	/* Enable interrupts */
@@ -179,6 +180,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
+	write(1, "abcdefghijklmnopqrstuvwxyz", 26);
 	/*
 	printf("testing terminal \n");
 	unsigned char buf[4000] = "!@#$QWE^&*()1234567890\n";
