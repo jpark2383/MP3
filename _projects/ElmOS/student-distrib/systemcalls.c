@@ -7,9 +7,45 @@
 #include "pagefile.h"
 
 int fd_rtc = 0;
-fops_t rtc_fops = {&rtc_open,&rtc_read,&rtc_write,&rtc_close};
-fops_t terminal_fops = {&terminal_open,&terminal_read,&terminal_write,&terminal_close};
-fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&filesystem_close};
+fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
+fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
+fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
+
+
+
+
+/*
+ * read()
+ * depends on the fd, either call terminal read, or rtc read, 
+ * INPUT: fd, fd number; buf, the buffer to pass in; nbytes, the number of bytes to copy into buffer.
+ * OUTPUT: on succeed, return 0, else, return -1
+ * RETURN: copy into buffer. 
+ */
+ 
+int32_t read (int32_t fd, void* buf, int32_t nbytes)
+{
+	if(buf == NULL || fd < 0 || fd > FD_MAX || pcblock.file_struct[fd].flags == 0 || nbytes < 0)
+	{
+		return -1;
+	}
+	return pcblock.file_struct[fd].fops_ptr->fops_read(fd, buf, nbytes);
+}
+/*
+ * write()
+ * depends on the fd, either call terminal write, or rtc write, 
+ * INPUT: fd, fd number; buf, the buffer to pass in; nbytes, the number of bytes to copy into buffer.
+ * OUTPUT: on succeed, return 0, else, return -1
+ * RETURN: display from buffer. 
+ */
+ 
+int32_t write (int32_t fd, const void* buf, int32_t nbytes)
+{
+	if(buf == NULL || fd < 0 || fd > FD_MAX || pcblock.file_struct[fd].flags == 0 || nbytes < 0)
+	{
+		return -1;
+	}
+	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
+}
 
 /*
  * int32_t syscall_open(const uint8_t * filename)

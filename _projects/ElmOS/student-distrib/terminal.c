@@ -170,6 +170,11 @@ void keyboard_read(unsigned char keystroke)
 			send_eoi(PIC_1);
 			return;
 		}
+		if(counter == 0)
+		{
+			send_eoi(PIC_1);
+			return;
+		}
 		setx(--x); //These lines delete the character
 		putc(' ');
 		//setx(x);
@@ -198,7 +203,7 @@ void keyboard_read(unsigned char keystroke)
  * RETURN: display_terminal number
  */
 
-int32_t read_helper(uint8_t *buf, uint32_t length)
+int32_t read_helper(uint8_t *buf, int32_t length)
 {
 	//printf("read_helper called \n");
 	//if((fd == 1) || (buf == NULL) || (length < 0))
@@ -242,7 +247,7 @@ int32_t read_helper(uint8_t *buf, uint32_t length)
  * RETURN: display_terminal number
  */
 
- int32_t write_helper(const uint8_t* text, uint32_t length)
+ int32_t write_helper(const uint8_t* text, int32_t length)
  {
  	//printf("write_helper called \n");
  	int i, j, k;
@@ -320,10 +325,10 @@ int32_t read_helper(uint8_t *buf, uint32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_write(int32_t fd, const uint8_t *buf, uint32_t len)
+int32_t terminal_write(int32_t fd, const void* buf, int32_t len)
 {
-	if (fd == 0) return -1
-	return write_helper(buf, len);
+	if (fd == 0) return -1;
+	return write_helper((uint8_t*)buf, len);
 }
 
 /*
@@ -333,8 +338,8 @@ int32_t terminal_write(int32_t fd, const uint8_t *buf, uint32_t len)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_read(int32_t fd, uint8_t *buf, uint32_t len)
+int32_t terminal_read(int32_t fd, void* buf, int32_t len)
 {
-	if (fd == 1) return -1
-	return read_helper(buf, len);
+	if (fd == 1) return -1;
+	return read_helper((uint8_t*)buf, len);
 }
