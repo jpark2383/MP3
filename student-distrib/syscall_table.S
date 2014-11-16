@@ -48,7 +48,6 @@ exit:
 	iret
 
 
-	
 /* jump table for system calls */
 system_call_table:
 .long sys_empty, sys_halt, sys_execute, sys_read, sys_write, sys_open, sys_close

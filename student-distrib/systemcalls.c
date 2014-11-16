@@ -13,6 +13,29 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
 
 
 
+/*
+ * halt
+ * 
+ * INPUT:
+ * OUTPUT:
+ * RETURN:
+ */
+int32_t halt (uint8_t status)
+{
+	return 0;
+}
+
+/*
+ * execute
+ * 
+ * INPUT:
+ * OUTPUT:
+ * RETURN:
+ */
+int32_t execute (const uint8_t* status)
+{
+	return 0;
+}
 
 /*
  * read()
@@ -21,7 +44,6 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
  * OUTPUT: on succeed, return 0, else, return -1
  * RETURN: copy into buffer. 
  */
- 
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
 	if(buf == NULL || fd < 0 || fd > FD_MAX || pcblock.file_struct[fd].flags == 0 || nbytes < 0)
@@ -30,6 +52,7 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	}
 	return pcblock.file_struct[fd].fops_ptr->fops_read(fd, buf, nbytes);
 }
+
 /*
  * write()
  * depends on the fd, either call terminal write, or rtc write, 
