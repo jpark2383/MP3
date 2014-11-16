@@ -196,14 +196,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 			return 1;
 		if(cr3==(uint32_t)task2_page_directory)
 			return 2;
-		if(cr3==(uint32_t)task3_page_directory)
-			return 3;
-		if(cr3==(uint32_t)task4_page_directory)
-			return 4;
-		if(cr3==(uint32_t)task5_page_directory)
-			return 5;
-		if(cr3==(uint32_t)task6_page_directory)
-			return 6;
 		return -1;
  }
 
