@@ -11,7 +11,7 @@
 .globl  tss, tss_desc_ptr, ldt, ldt_desc_ptr
 .globl  gdt_ptr, gdt_desc_ptr
 .globl  idt_desc_ptr, idt
-.globl  page_directory, page_table
+.globl  page_directory, page_table, task1_page_directory, page_table1
 
 .align 4
 
@@ -124,16 +124,16 @@ _page_table:
 	.rept NUM_ENTRIES_PT
 	.long 0
 	.endr
+
+page_table1:
+_page_table1:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr	
+
 .align 4096
 task1_page_directory:
 _task1_page_directory:
-	.rept NUM_ENTRIES_PD
-	.long 0
-	.endr
-	
-.align 4096
-task2_page_directory:
-_task2_page_directory:
 	.rept NUM_ENTRIES_PD
 	.long 0
 	.endr

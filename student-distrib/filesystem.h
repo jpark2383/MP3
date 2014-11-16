@@ -19,7 +19,7 @@
 #define B_36 36
 #define B_40 40
 #define B_64 64
-
+#define PROGRAM_IMG 0x08048000
 typedef struct dentry
 {
 	uint8_t file_name[32];
@@ -57,6 +57,7 @@ typedef struct file_struct
 fs_t filesystem;
 uint32_t * BOOT_BLOCK_PTR;
 dentry_t dentry[8];
+dentry_t dentry1;
 file_struct_t file_struct[8];
 
 
@@ -70,4 +71,5 @@ extern int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes);
 extern int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes);
 extern int32_t dirread();
 extern int32_t dirwrite();
+extern int loader(const uint8_t* filename);
 #endif /* _FILESYSTEM_H */

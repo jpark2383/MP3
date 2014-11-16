@@ -32,8 +32,48 @@ int32_t halt (uint8_t status)
  * OUTPUT:
  * RETURN:
  */
-int32_t execute (const uint8_t* status)
+int32_t execute (const uint8_t* command)
 {
+	uint32_t eip = 0;
+	int i;
+	if(command == NULL)
+		return -1;
+	eip = loader(command);
+	if(eip == -1)
+		return -1;
+	pcblock.file_struct[SDIN].flags =1;
+	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
+	pcblock.file_struct[SDOUT].flags =1;
+	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
+	for(i = 2; i <= 7; i++)
+		pcblock.file_struct[i].flags= 0;
+	//get the esp	
+	asm ("movl %%esp, %0;"
+     :"=r"(pcblock.esp)       
+     );
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = pcblock.esp;
+	asm volatile("              \n\
+		cli 				\n\
+		movw  %0, %%ax      \n\
+		movw %%ax, %%ds		\n\
+		pushl %0			\n\
+		pushl %1			\n\
+		pushfl          	\n\
+		#we have to reenable the interrupts at 0x200	\n\
+		popl %%eax			\n\
+		orl $0x200, %%eax   \n\
+		pushl %%eax			\n\
+		pushl %2			\n\
+		pushl %3			\n\
+		iret 				\n\
+		"
+		: 
+		: "g"(USER_DS), "g"(MB_132 - 4), "g"(USER_CS), "g"(eip)
+		: "eax", "memory"
+	);
+	
+	
 	return 0;
 }
 
@@ -194,8 +234,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 			return 0;
 		if(cr3==(uint32_t)task1_page_directory)
 			return 1;
-		if(cr3==(uint32_t)task2_page_directory)
-			return 2;
 		return -1;
  }
 

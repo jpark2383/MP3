@@ -256,30 +256,33 @@ int32_t dirwrite()
 
 int loader(const uint8_t* filename)
 {
-    uint32_t inode; inode_ptr, data_length, block_num, eip;
+    uint32_t inode, data_length, block_num, eip;
+	uint32_t *inode_ptr;
 	uint32_t *block_ptr;
 	uint8_t buf[4];
-	if(read_dentry_by_name(filename, &dentry) == -1)
+	if(read_dentry_by_name(filename, &dentry1) == -1)
 		return  -1; //File not found
 	/*check if the file is executable*/
-	inode = dentry.inode_number;
+	inode = dentry1.inode_number;
 	inode_ptr = BOOT_BLOCK_PTR + (inode + 1) * BYTES_4K;
-	data_length = *(inode__ptr);
+	data_length = *(inode_ptr);
 	//check if data length is valid
 	if(data_length< 4)
 		return -1;
-	block_num = *(inode__ptr + BYTES_4);
+	block_num = *(inode_ptr + BYTES_4);
 	block_ptr = filesystem.data_start + block_num * BYTES_4K;
 	memcpy(buf, block_ptr, 4);
 	/*executable*/
 	if(buf[0] == 0x7f && buf[1] == 0x45 && buf[2] ==0x4c && buf[3] == 0x46)
 	{
 		uint8_t data_buf[data_length];
-		read_data(dentry.inode_index, 0, data_buf, data_length);
+		read_data(dentry1.inode_number, 0, data_buf, data_length);
+		/*get the eip*/
 		eip = data_buf[27] << 24 | data_buf[26] << 16 | data_buf[25] << 8  | data_buf[24];
-		asm volatile ("mov %0, %%CR3":: "b"(page_directory_task1));
-		memccpy()
 		
+		asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
+		//load the program into execution space. 
+		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		return eip;
 	}
 	else
