@@ -5,19 +5,19 @@
 #include "lib.h"
 #include "x86_desc.h"
 #include "pagefile.h"
+
 int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 fops_t terminal_fops = {&terminal_open,&terminal_read,&terminal_write,&terminal_close};
 fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&filesystem_close};
 
 /*
- * int32_t open(const uint8_t * filename)
- * find a new unused fd, and mark it used. and open it.  
- * INPUT: filename, the name of the file you want to open.
- * OUTPUT: on succeed, return fd number, else, return -1
- * RETURN: open a new fd
+ * int32_t syscall_open(const uint8_t * filename)
+ * 
+ * INPUT: 
+ * OUTPUT: 
+ * RETURN: 
  */
- 
  int32_t syscall_open (const uint8_t* filename)
  {
 	int taken = 1;
@@ -68,13 +68,12 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  }
  
  /*
- * int32_t close(int32_t fd)
- * close the current fd
- * INPUT: fd number to be closed
- * OUTPUT: on succeed, return 0, else, return -1
- * RETURN: close a fd. 
+ * int32_t syscall_close(int32_t fd)
+ * 
+ * INPUT: 
+ * OUTPUT: 
+ * RETURN: 
  */
- 
  int32_t syscall_close (int32_t fd)
  {
 	int i;
@@ -115,13 +114,45 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
 	else
 		return -1;
  }
+
+ /*
+ * read
+ * 
+ * INPUT:
+ * OUTPUT: 
+ * RETURN: 
+ */
+int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
+	if(fd > FD_MAX || fd < FD_MIN)				/* invalid file descriptor */
+		return -1;
+	if(pcblock.file_struct[fd].flags == 0)		/* current file descriptor is not being used*/
+		return -1;
+
+	return pcblock.file_struct[fd].fops_ptr->fops_read(fd, buf, nbytes);
+}
+
+ /*
+ * write
+ * System call write links it to the right handler depending on file type
+ * INPUT: fd (file descriptor), buf (buffer to write), nbytes (# of bytes to write)
+ * OUTPUT: runs write call
+ * RETURN: number of bytes written
+ */
+int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
+	if(fd > FD_MAX || fd < FD_MIN)				/* invalid file descriptor */
+		return -1;
+	if(pcblock.file_struct[fd].flags == 0)		/* current file descriptor is not being used*/
+		return -1;
+	
+	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
+}
  
  /*
  * find_pid
- * get the pid number of the current process
- * INPUT: NONE
- * OUTPUT: wpid number
- * RETURN: NONE
+ * 
+ * INPUT:
+ * OUTPUT:
+ * RETURN:
  */ 
  //This needs to be changed
 

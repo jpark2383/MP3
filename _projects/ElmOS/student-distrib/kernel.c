@@ -170,7 +170,7 @@ entry (unsigned long magic, unsigned long addr)
 	rtc_init();
 	init_fs();
 	enable_irq(PIC_1);
-	terminal_open(0);
+	//terminal_open(0);
 	clear();
 
 	/* Enable interrupts */
@@ -190,14 +190,19 @@ entry (unsigned long magic, unsigned long addr)
 	printf("done testing terminal \n");
 	//clear(); // Clears the screen before test_interrupts
 	//int x = 1/0;
+	
+	*/
+	 
 	// Tests for RTC
+	/*
 	for(i = 0; i < 1000000000; i++);
-	rtc_read(0,0,0);
-	//int j = 1024;
-	//rtc_write(0,&j,4);
+	rtc_read();
+	int j = 1024;
+	rtc_write(&j,4);
 	for(i = 0; i < 1000000000; i++);
-	rtc_read(0,0,0);
-*/
+	rtc_read();
+	*/
+
 
 	/*testing open and read file*/
 	

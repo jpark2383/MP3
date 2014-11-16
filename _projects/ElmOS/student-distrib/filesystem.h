@@ -45,12 +45,13 @@ typedef struct fops
 	int32_t (*fops_close)(int32_t fd);
 } fops_t;
 
+/* structure for the PCB */
 typedef struct file_struct
 {
-	fops_t* fops_ptr;
-	uint32_t* inode_ptr;
-	uint32_t fpos;
-	uint32_t flags;
+	fops_t* fops_ptr;		/* file operations jump table */
+	uint32_t* inode_ptr;	/* pointer to inode for this file, only for data files */
+	uint32_t fpos;			/* file position member, keeps track of where the user is reading from in the file. read should update this */
+	uint32_t flags;			/* flags for keeping this fd in-use */
 } file_struct_t;
 
 fs_t filesystem;

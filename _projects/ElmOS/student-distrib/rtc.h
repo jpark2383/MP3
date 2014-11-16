@@ -28,10 +28,10 @@
 
 extern void rtc_init(); // Initilization of the RTC. Starts at 2
 extern void rtc_interrupt(); // Handler for RTC interrupts
-extern int32_t rtc_open(const uint8_t* filename);
-extern int32_t rtc_close(int32_t fd);
-extern int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes);
-extern int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes);
+extern int32_t rtc_open();
+extern int32_t rtc_close();
+extern int32_t rtc_read();
+extern int32_t rtc_write(const void* buf, int32_t nbytes);
 extern void rtc_set(int32_t freq); // helper for setting RTC frequency
 
 #endif
