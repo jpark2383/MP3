@@ -198,11 +198,7 @@ void keyboard_read(unsigned char keystroke)
  * RETURN: display_terminal number
  */
 
-<<<<<<< .mine
-int32_t read_helper(int32_t fd, uint8_t *buf, int32_t length)
-=======
 int32_t read_helper(uint8_t *buf, uint32_t length)
->>>>>>> .r15730
 {
 	//printf("read_helper called \n");
 	//if((fd == 1) || (buf == NULL) || (length < 0))
@@ -246,11 +242,7 @@ int32_t read_helper(uint8_t *buf, uint32_t length)
  * RETURN: display_terminal number
  */
 
-<<<<<<< .mine
- int32_t write_helper(int32_t fd, const uint8_t* text, int32_t length)
-=======
  int32_t write_helper(const uint8_t* text, uint32_t length)
->>>>>>> .r15730
  {
  	//printf("write_helper called \n");
  	int i, j, k;
@@ -328,10 +320,9 @@ int32_t read_helper(uint8_t *buf, uint32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-
-int32_t terminal_write(int32_t fd, const void *text, int32_t length)
+int32_t terminal_write(const uint8_t *buf, uint32_t len)
 {
-	return write_helper(text, length);
+	return write_helper(buf, len);
 }
 
 /*
@@ -341,7 +332,7 @@ int32_t terminal_write(int32_t fd, const void *text, int32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-int32_t terminal_read(int32_t fd, void *buf, int32_t length)
+int32_t terminal_read(uint8_t *buf, uint32_t len)
 {
-	return read_helper(buf, length);
+	return read_helper(buf, len);
 }
