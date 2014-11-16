@@ -18,7 +18,7 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  * OUTPUT: 
  * RETURN: 
  */
- int32_t syscall_open (const uint8_t* filename)
+ int32_t open (const uint8_t* filename)
  {
 	int taken = 1;
 	int pid = 0;
@@ -74,7 +74,7 @@ fops_t filesystem_fops = {&filesystem_open,&filesystem_read,&terminal_write,&fil
  * OUTPUT: 
  * RETURN: 
  */
- int32_t syscall_close (int32_t fd)
+ int32_t close (int32_t fd)
  {
 	int i;
 	// check for valid file descriptor
