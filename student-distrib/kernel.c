@@ -180,12 +180,13 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	/*printf("Enabling Interrupts\n");*/
 	sti();
-	write(1, "abcdefghijklmnopqrstuvwxyz", 26);
+	//write(1, "abcdefghijklmnopqrstuvwxyz", 26);
 	/*
-	printf("testing terminal \n");
+	printf("testing terminal \n");*/
 	unsigned char buf[4000] = "!@#$QWE^&*()1234567890\n";
 	terminal_write(1, buf, 4000);
-	unsigned char buf2[4000] = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\n";
+	write(1, buf, 4000);
+	/*unsigned char buf2[4000] = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\n";
 	terminal_write(1, buf2, 4000);
 	terminal_read(0, buf, 4000);
 	terminal_write(1, buf, 4000);

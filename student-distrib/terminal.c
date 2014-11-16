@@ -327,6 +327,7 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  */
 int32_t terminal_write(int32_t fd, const void* buf, int32_t len)
 {
+	printf("terminal write called\n");
 	if (fd == 0) return -1;
 	return write_helper((uint8_t*)buf, len);
 }

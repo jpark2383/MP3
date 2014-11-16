@@ -67,6 +67,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	{
 		return -1;
 	}
+	printf("got here\n");
 	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
 }
 
@@ -173,38 +174,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	else
 		return -1;
  }
-
- /*
- * read
- * 
- * INPUT:
- * OUTPUT: 
- * RETURN: 
- */
-int32_t syscall_read(int32_t fd, void* buf, int32_t nbytes){
-	if(fd > FD_MAX || fd < FD_MIN)				/* invalid file descriptor */
-		return -1;
-	if(pcblock.file_struct[fd].flags == 0)		/* current file descriptor is not being used*/
-		return -1;
-
-	return pcblock.file_struct[fd].fops_ptr->fops_read(fd, buf, nbytes);
-}
-
- /*
- * write
- * System call write links it to the right handler depending on file type
- * INPUT: fd (file descriptor), buf (buffer to write), nbytes (# of bytes to write)
- * OUTPUT: runs write call
- * RETURN: number of bytes written
- */
-int32_t syscall_write(int32_t fd, const void* buf, int32_t nbytes){
-	if(fd > FD_MAX || fd < FD_MIN)				/* invalid file descriptor */
-		return -1;
-	if(pcblock.file_struct[fd].flags == 0)		/* current file descriptor is not being used*/
-		return -1;
-	
-	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
-}
  
  /*
  * find_pid
