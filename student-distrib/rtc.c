@@ -40,7 +40,7 @@ void rtc_init(){
 *   RETURN VALUE: None
 *   SIDE EFFECTS: None
 */ 
-int32_t rtc_open(){
+int32_t rtc_open(const uint8_t* filename){
 	rtc_init();
 	return 0;
 }
@@ -53,7 +53,7 @@ int32_t rtc_open(){
 *   RETURN VALUE: None
 *   SIDE EFFECTS: None
 */ 
-int32_t rtc_close(){
+int32_t rtc_close(int32_t fd){
 	return 0;
 }
 
@@ -67,7 +67,7 @@ int32_t rtc_close(){
 *   RETURN VALUE: None
 *   SIDE EFFECTS: None
 */ 
-int32_t rtc_read(){
+int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
 	printf("entering RTC_read... \n");
 	intr_flag = 0;
 	while(intr_flag == 0);
@@ -86,7 +86,7 @@ int32_t rtc_read(){
 *   RETURN VALUE: None
 *   SIDE EFFECTS: None
 */ 
-int32_t rtc_write(const void* buf, int32_t nbytes){
+int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
 
 	if (((const int32_t*)buf) == NULL)
 		return -1;
