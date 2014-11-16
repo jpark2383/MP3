@@ -72,7 +72,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 }
 
 /*
- * int32_t syscall_open(const uint8_t * filename)
+ * int32_t open(const uint8_t * filename)
  * 
  * INPUT: 
  * OUTPUT: 
@@ -80,7 +80,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  */
  int32_t open (const uint8_t* filename)
  {
-	int taken = 1;
+//	int taken = 1;
 	int pid = 0;
 	pid = find_pid();
 	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*pid - START);
@@ -89,12 +89,12 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	{
 		return -1;
 	}
-	//check each file descriptor for one that hasn't been used.
+	//Iterate through the array to find an unused fd.
 	for(fd_index = FD_MIN; fd_index < FILE_ARRAY_SIZE; fd_index++)
 	{
 		if(pcblock.file_struct[fd_index].flags == 0)
 		{
-			taken = 0;
+//			taken = 0;
 			break;
 		}
 	}
@@ -125,10 +125,10 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		memcpy(pcb_ptr, &pcblock, pcb_size);
 		return fd_index;
 	}
- }
+ } 
  
  /*
- * int32_t syscall_close(int32_t fd)
+ * int32_t close(int32_t fd)
  * 
  * INPUT: 
  * OUTPUT: 
@@ -145,7 +145,11 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	
 	if(pcblock.file_struct[fd].flags == 1)
 	{
-		pcblock.file_struct[fd].fpos = 0;		
+		pcblock.file_struct[fd].fpos = 0;
+		pcblock.dentry[fd].file_type = NULL;
+		pcblock.dentry[fd].inode_number = NULL;
+		pcblock.file_struct[fd_index].fops_ptr = NULL;
+				
 		for(i = 0; i < B_32; i++)
 		{
 			pcblock.dentry[fd].file_name[i] = NULL;
@@ -154,10 +158,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		{
 			pcblock.dentry[fd].reserved[i] = NULL;
 		}
-		pcblock.dentry[fd].file_type = NULL;
-		pcblock.dentry[fd].inode_number = NULL;
-		pcblock.file_struct[fd_index].fops_ptr = NULL;
-		
+
 		if(fd_rtc > 1 && fd == fd_rtc)
 		{
 			rtc_close(fd);
@@ -174,6 +175,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	else
 		return -1;
  }
+
  
  /*
  * find_pid
