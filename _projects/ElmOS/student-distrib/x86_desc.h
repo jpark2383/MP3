@@ -126,10 +126,10 @@ extern uint32_t tss_size;
 extern seg_desc_t tss_desc_ptr;
 extern tss_t tss;
 
-extern uint32_t page_table[NUM_ENTRIES_PT]; //Page Tables are externed 
+extern uint32_t page_table[NUM_ENTRIES_PT]; //Page Tables are externed
+extern uint32_t page_table1[NUM_ENTRIES_PT]; 
 uint32_t page_directory[NUM_ENTRIES_PD]; 
 uint32_t task1_page_directory[NUM_ENTRIES_PD];
-uint32_t task2_page_directory[NUM_ENTRIES_PD];
 
 /* Sets runtime-settable parameters in the GDT entry for the LDT */
 #define SET_LDT_PARAMS(str, addr, lim) \
