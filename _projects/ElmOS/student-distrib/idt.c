@@ -7,6 +7,7 @@
 #include "idt.h"
 #include "lib.h"
 #include "interrupt_handler.h"
+#include "syscall_table.h"
 //#include "intr_handler.h"
 
 /* 
@@ -117,8 +118,9 @@ void init_idt()
 		set_intr_gate(i, (uint32_t)&ignore_int);
 	set_intr_gate(33, (uint32_t)&keyboard_handler);
 	set_intr_gate(40, (uint32_t)&rtc_handler);
+	set_intr_gate(128, (uint32_t)&syscall_handler);
 }
-
+	
 // Code for all of the Exceptions
 void divide_by_0()
 {
@@ -234,7 +236,6 @@ void simd_coprocessor_error()
 	cli();
 	while(1);
 }
-
 
 // Other Reserved for INTEL
 void ignore_int()
