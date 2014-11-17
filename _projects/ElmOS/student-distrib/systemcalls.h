@@ -22,6 +22,7 @@
 #define FD_MIN			2
 #define SDIN			0
 #define SDOUT			1
+#define MAX_FD			7
 typedef struct __attribute__((packed)) pcb_t
 {
 	uint32_t *prev_pcb;
