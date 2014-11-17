@@ -7,7 +7,7 @@
 
 #define pcb_size		753
 #define MB_132			0x08400000
-
+#define KB_8			0x2000
 #define EIGHT_MB		0x800000
 #define FOUR_MB			0x400000
 #define ZERO_MB			0x0
@@ -28,7 +28,7 @@ typedef struct __attribute__((packed)) pcb_t
 	uint32_t *espptr;
 	uint32_t esp;
 	uint32_t old_pc;
-	uint32_t *ret_eip;
+	uint32_t eip;
 	uint32_t *ret_ebp;
 	uint32_t *ret_pd;
 	file_struct_t file_struct[8];
