@@ -6,7 +6,9 @@
 #include "x86_desc.h"
 #include "pagefile.h"
 
+//global variable for the rtc file descriptor.
 int fd_rtc = 0;
+//declartions of file ops for the rtc, terminal, and filesystem.
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};

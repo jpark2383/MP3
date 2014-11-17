@@ -25,6 +25,8 @@
 #define MAGIC_NUM_3  0x4c
 #define MAGIC_NUM_4  0x46
 #define PROGRAM_IMG 0x08048000
+
+//declartion of data entry struct
 typedef struct dentry
 {
 	uint8_t file_name[32];
@@ -33,6 +35,7 @@ typedef struct dentry
 	uint8_t reserved[24];
 } dentry_t;
 
+//declaration of filesystem struct
 typedef struct fs
 {
 	uint32_t num_dir_entries;
@@ -42,6 +45,7 @@ typedef struct fs
 	uint32_t * data_start;
 }fs_t; 
 
+//declartion of file operations
 typedef struct fops
 {
 	int32_t (*fops_open)(const uint8_t* filename);
@@ -50,7 +54,7 @@ typedef struct fops
 	int32_t (*fops_close)(int32_t fd);
 } fops_t;
 
-/* structure for the PCB */
+/* file struct used in the PCB */
 typedef struct file_struct
 {
 	fops_t* fops_ptr;		/* file operations jump table */
