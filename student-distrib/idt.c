@@ -118,7 +118,7 @@ void init_idt()
 		set_intr_gate(i, (uint32_t)&ignore_int);
 	set_intr_gate(33, (uint32_t)&keyboard_handler);
 	set_intr_gate(40, (uint32_t)&rtc_handler);
-	set_intr_gate(128, (uint32_t)&syscall_handler);
+	set_system_gate(128, (uint32_t)&syscall_handler);
 }
 	
 // Code for all of the Exceptions
