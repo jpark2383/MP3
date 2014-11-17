@@ -1,7 +1,7 @@
 #include "keyboard.h"
 
 // flags for shift, alt, caps, etc.
-int shift_flag, alt_flag, caps_flag, ctrl_flag, l_shift, r_shift;
+int shift_flag = 0, alt_flag, caps_flag = 0, ctrl_flag, l_shift, r_shift;
 // handle numbers and lower case letters 
 unsigned char key_codes[90] = {
 0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 
