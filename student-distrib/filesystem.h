@@ -16,9 +16,14 @@
 #define B_8 8 
 #define B_32 32
 #define B_24 24
+#define B_16 16
 #define B_36 36
 #define B_40 40
 #define B_64 64
+#define MAGIC_NUM_1  0x7f
+#define MAGIC_NUM_2  0x45
+#define MAGIC_NUM_3  0x4c
+#define MAGIC_NUM_4  0x46
 #define PROGRAM_IMG 0x08048000
 typedef struct dentry
 {
@@ -59,7 +64,7 @@ uint32_t * BOOT_BLOCK_PTR;
 dentry_t dentry[8];
 dentry_t dentry1;
 file_struct_t file_struct[8];
-extern int counter;
+uint32_t pc;
 
 extern void init_fs();
 extern int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry);

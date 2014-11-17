@@ -14,7 +14,7 @@ void init_fs()
    filesystem.num_data_blocks = *(BOOT_BLOCK_PTR + BYTES_8);
    filesystem.dentry_begin = (uint8_t *)(BOOT_BLOCK_PTR + BYTES_64);
    filesystem.data_start = BOOT_BLOCK_PTR + (filesystem.num_inodes+1)*BYTES_4K;
-   counter =0;
+   pc =0;
 }
 
 
@@ -253,7 +253,15 @@ int32_t dirwrite()
 	return -1;
 }
 
+/*
+ *   loader
+ *   DESCRIPTION: check if the file is executable, if it is load it in programming memory
+ *   INPUTS: name of the file
+ *   RETURN VALUE: eip if success, -1 if fail 
+ *   SIDE EFFECTS: does nothing
+*
 
+*/
 
 int loader(const uint8_t* filename)
 {
@@ -274,13 +282,16 @@ int loader(const uint8_t* filename)
 	block_ptr = filesystem.data_start + block_num * BYTES_4K;
 	memcpy(buf, block_ptr, 4);
 	/*executable*/
-	if(buf[0] == 0x7f && buf[1] == 0x45 && buf[2] ==0x4c && buf[3] == 0x46)
+	if(buf[0] == MAGIC_NUM_1 && buf[1] == MAGIC_NUM_2 && buf[2] ==MAGIC_NUM_3 && buf[3] == MAGIC_NUM_4)
 	{
 		uint8_t data_buf[data_length];
 		read_data(dentry1.inode_number, 0, data_buf, data_length);
 		/*get the eip*/
-		eip = data_buf[27] << 24 | data_buf[26] << 16 | data_buf[25] << 8  | data_buf[24];
-			asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
+		eip = data_buf[27] << B_24 | data_buf[26] << B_16 | data_buf[25] << B_8  | data_buf[24];
+			if (pc ==0)
+				asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
+			else if (pc ==1)
+				asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		return eip;

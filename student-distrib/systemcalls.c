@@ -23,17 +23,15 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
 int32_t halt (uint8_t status)
 {
 
-	
-	//asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));
-	/*
+	//try to halt from shell, restart shell
+	if(pc <= 1)
+	{
+		uint8_t filename[] = "shell";
+		execute(filename);
+	}
 	asm volatile ("mov %0, %%CR3":: "b"(pcblock.ret_pd));
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = MB_132 -4;
-	//asm volatile("movl %0, %%esp"::"g"(pcblock.esp));
-	//asm volatile("movl %0, %%esp"::"g"(pcblock.ret_ebp));
-	uint8_t filename[] = "shell";
-	execute(filename);	
-
+	tss.esp0 = pcblock.esp;	
 	asm volatile("              \n\
 		#cli 				\n\
 		movw  %0, %%ax      \n\
@@ -51,8 +49,8 @@ int32_t halt (uint8_t status)
 		: "eax"
 		);
 	return 0;
-	*/
-	//Start the shell
+	
+	//
 	uint8_t filename[] = "shell";
 	execute(filename);		
 	return 0;
@@ -74,15 +72,16 @@ int32_t execute (const uint8_t* command)
 	eip = loader(command);
 	if(eip == -1)
 		return -1;
-	pcblock.eip = eip;
+	//enable terminal
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
-	for(i = 2; i <= 7; i++)
+	//mark all other file struct as unoccupied 
+	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
-		
-	pcblock.ret_pd = task2_page_directory;
+	
+	asm volatile ("mov %%CR3, %0": "=b"(pcblock.ret_pd));
 	//get the esp
 	asm ("movl %%esp, %0;"
      :"=r"(pcblock.esp)       
@@ -124,7 +123,8 @@ int32_t execute (const uint8_t* command)
 			:
 			:
 			: "cc"
-			);	
+			);
+	pc = pc-1;
 	return 0;
 }
 
