@@ -40,6 +40,11 @@ void paging_init()
 	task1_page_directory[0] = (uint32_t) page_table1 | USER_SUPERVISOR | PRESENT | MASK_RW ;
 	task1_page_directory[1] = KERNEL_PTR;
 	task1_page_directory[32]= MB_8_MAP;
+	//program 2
+	page_table2[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	task2_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	task2_page_directory[1] = KERNEL_PTR;
+	task2_page_directory[32]= MB_12_MAP;
 	
 	//The below code fetches the register values , sets them appropriately and writes them back
 	asm volatile ("mov %0, %%CR3":: "b"(page_directory));
