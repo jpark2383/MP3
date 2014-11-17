@@ -14,11 +14,11 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
 
 
 /*
- * halt
- * 
- * INPUT:
- * OUTPUT:
- * RETURN:
+ * int32_t halt (uint8_t status)
+ * This system call will terminate the current process and return to the shell
+ * INPUT: uint8_t status: ignore
+ * OUTPUT: None
+ * RETURN: Return 0
  */
 int32_t halt (uint8_t status)
 {
@@ -52,18 +52,18 @@ int32_t halt (uint8_t status)
 		);
 	return 0;
 	*/
-	//
+	//Start the shell
 	uint8_t filename[] = "shell";
 	execute(filename);		
 	return 0;
 }
 
 /*
- * execute
- * 
- * INPUT:
- * OUTPUT:
- * RETURN:
+ * int32_t execute (const uint8_t* command)
+ * Starts a new process with the given command
+ * INPUT: const uint8_t* command: string with the name of the program
+ * OUTPUT: None
+ * RETURN: 0 on success
  */
 int32_t execute (const uint8_t* command)
 {
@@ -129,11 +129,13 @@ int32_t execute (const uint8_t* command)
 }
 
 /*
- * read()
- * depends on the fd, either call terminal read, or rtc read, 
- * INPUT: fd, fd number; buf, the buffer to pass in; nbytes, the number of bytes to copy into buffer.
- * OUTPUT: on succeed, return 0, else, return -1
- * RETURN: copy into buffer. 
+ * int32_t read (int32_t fd, void* buf, int32_t nbytes)
+ * System call for read. Uses a jump table to call the corresponding read function 
+ * INPUT: int32_t fd: file descriptor
+		  void* buf: buffer to be read to
+		  int32_t nbytes: number of bytes to read
+ * OUTPUT: Puts data into the buffer
+ * RETURN: 0 on success, -1 otherwise
  */
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
@@ -145,11 +147,13 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 }
 
 /*
- * write()
- * depends on the fd, either call terminal write, or rtc write, 
- * INPUT: fd, fd number; buf, the buffer to pass in; nbytes, the number of bytes to copy into buffer.
- * OUTPUT: on succeed, return 0, else, return -1
- * RETURN: display from buffer. 
+ * int32_t write (int32_t fd, void* buf, int32_t nbytes)
+ * System call for write. Uses a jump table to call the corresponding read function 
+ * INPUT: int32_t fd: file descriptor
+		  void* buf: buffer to be written
+		  int32_t nbytes: number of bytes to write
+ * OUTPUT: Writes data from buffer
+ * RETURN: 0 on success, -1 otherwise
  */
  
 int32_t write (int32_t fd, const void* buf, int32_t nbytes)
@@ -164,10 +168,10 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 
 /*
  * int32_t open(const uint8_t * filename)
- * 
- * INPUT: 
- * OUTPUT: 
- * RETURN: 
+ * System call for open
+ * INPUT: const uint8_t* filename: file to be opened
+ * OUTPUT: None
+ * RETURN: File descriptor of file opened
  */
  int32_t open (const uint8_t* filename)
  {
@@ -218,12 +222,12 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	}
  } 
  
- /*
- * int32_t close(int32_t fd)
- * 
- * INPUT: 
- * OUTPUT: 
- * RETURN: 
+/*
+ * int32_t close(const uint8_t * filename)
+ * System call for close
+ * INPUT: int32_t fd: file descriptor to be closed
+ * OUTPUT: None
+ * RETURN: 0 on success, -1 otherwise
  */
  int32_t close (int32_t fd)
  {
@@ -269,11 +273,11 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 
  
  /*
- * find_pid
- * 
- * INPUT:
- * OUTPUT:
- * RETURN:
+ * int find_pid()
+ * Finds the PID of the current process using CR3
+ * INPUT: None
+ * OUTPUT: The PID of the current process
+ * RETURN: The PID of the current process
  */ 
 
  int find_pid()
