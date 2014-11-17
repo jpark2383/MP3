@@ -228,7 +228,7 @@ entry (unsigned long magic, unsigned long addr)
 	//dirread();
 	
 	/* Execute the first program (`shell') ... */
-	uint8_t filename[] = "hello";	
+	uint8_t filename[] = "shell";	
 	execute(filename);
 	
 	

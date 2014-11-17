@@ -7,6 +7,7 @@
 
 #define pcb_size		753
 #define MB_132			0x08400000
+
 #define EIGHT_MB		0x800000
 #define FOUR_MB			0x400000
 #define ZERO_MB			0x0
