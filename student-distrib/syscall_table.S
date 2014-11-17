@@ -12,8 +12,10 @@ syscall_handler:
 
 	/* save all */
 	pushl %eax
-	push %es
-	push %ds
+	pushw %es
+	pushw %ds
+	pushw %fs
+	pushw %gs
 	pushl %ebx
 	pushl %ebp
 	pushl %ecx
@@ -48,8 +50,10 @@ exit:
 	popl %ecx
 	popl %ebp
 	popl %ebx
-	popl %ds
-	popl %es
+	popw %gs
+	popw %fs
+	popw %ds
+	popw %es
 	addl $4, %esp
 	iret				/* interrupt return */
 

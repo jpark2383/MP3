@@ -22,14 +22,39 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
  */
 int32_t halt (uint8_t status)
 {
-	//asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));	
+
+	
+	//asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));
+	/*
 	asm volatile ("mov %0, %%CR3":: "b"(pcblock.ret_pd));
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = MB_132;
-	asm volatile("movl %0, %%esp"::"g"(pcblock.esp));
-	asm volatile("movl %0, %%esp"::"g"(pcblock.ret_ebp));
-	asm volatile("leave");
-	asm volatile("ret");
+	tss.esp0 = MB_132 -4;
+	//asm volatile("movl %0, %%esp"::"g"(pcblock.esp));
+	//asm volatile("movl %0, %%esp"::"g"(pcblock.ret_ebp));
+	uint8_t filename[] = "shell";
+	execute(filename);	
+
+	asm volatile("              \n\
+		#cli 				\n\
+		movw  %0, %%ax      \n\
+		movw %%ax, %%ds		\n\
+		pushl %0			\n\
+		pushl %1			\n\
+		pushl $0x200         	\n\
+		pushl %2			\n\
+		pushl %3			\n\
+		movl %4, %%ebp		\n\
+		iret 				\n\
+		"
+		:
+		: "g"(KERNEL_DS), "g"(pcblock.esp), "g"(KERNEL_CS), "g"(pcblock.eip), "g"(pcblock.ret_ebp)
+		: "eax"
+		);
+	return 0;
+	*/
+	//
+	uint8_t filename[] = "shell";
+	execute(filename);		
 	return 0;
 }
 
@@ -57,7 +82,7 @@ int32_t execute (const uint8_t* command)
 	for(i = 2; i <= 7; i++)
 		pcblock.file_struct[i].flags= 0;
 		
-	pcblock.ret_pd = task1_page_directory;
+	pcblock.ret_pd = task2_page_directory;
 	//get the esp
 	asm ("movl %%esp, %0;"
      :"=r"(pcblock.esp)       
@@ -67,8 +92,14 @@ int32_t execute (const uint8_t* command)
 	:
 	: "cc" );
 	asm volatile("movl %0, %%esp" : : "r"(MB_132));	
+	asm volatile("movl $halt_pos, %0" 
+	: "=a"(pcblock.eip)
+	:
+	: "cc" );
+
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = MB_132;
+	tss.esp0 = MB_132 - KB_8;
+	//counter++;
 	asm volatile("              \n\
 		cli 				\n\
 		movw  %0, %%ax      \n\
@@ -88,7 +119,12 @@ int32_t execute (const uint8_t* command)
 		: "g"(USER_DS), "g"(MB_132 - 4), "g"(USER_CS), "g"(eip)
 		: "eax", "memory"
 	);
-	
+	asm volatile("halt_pos: 			"
+				 "ret					"
+			:
+			:
+			: "cc"
+			);	
 	return 0;
 }
 

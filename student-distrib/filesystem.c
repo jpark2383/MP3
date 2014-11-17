@@ -14,6 +14,7 @@ void init_fs()
    filesystem.num_data_blocks = *(BOOT_BLOCK_PTR + BYTES_8);
    filesystem.dentry_begin = (uint8_t *)(BOOT_BLOCK_PTR + BYTES_64);
    filesystem.data_start = BOOT_BLOCK_PTR + (filesystem.num_inodes+1)*BYTES_4K;
+   counter =0;
 }
 
 
@@ -279,8 +280,7 @@ int loader(const uint8_t* filename)
 		read_data(dentry1.inode_number, 0, data_buf, data_length);
 		/*get the eip*/
 		eip = data_buf[27] << 24 | data_buf[26] << 16 | data_buf[25] << 8  | data_buf[24];
-		
-		asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
+			asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		return eip;

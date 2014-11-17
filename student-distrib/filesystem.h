@@ -59,7 +59,7 @@ uint32_t * BOOT_BLOCK_PTR;
 dentry_t dentry[8];
 dentry_t dentry1;
 file_struct_t file_struct[8];
-
+extern int counter;
 
 extern void init_fs();
 extern int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry);
