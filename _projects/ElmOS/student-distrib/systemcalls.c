@@ -22,6 +22,14 @@ fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &
  */
 int32_t halt (uint8_t status)
 {
+	//asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));	
+	asm volatile ("mov %0, %%CR3":: "b"(pcblock.ret_pd));
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = MB_132;
+	asm volatile("movl %0, %%esp"::"g"(pcblock.esp));
+	asm volatile("movl %0, %%esp"::"g"(pcblock.ret_ebp));
+	asm volatile("leave");
+	asm volatile("ret");
 	return 0;
 }
 
@@ -41,22 +49,26 @@ int32_t execute (const uint8_t* command)
 	eip = loader(command);
 	if(eip == -1)
 		return -1;
+	pcblock.eip = eip;
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
 	for(i = 2; i <= 7; i++)
 		pcblock.file_struct[i].flags= 0;
+		
+	pcblock.ret_pd = task1_page_directory;
 	//get the esp
-	pcblock.esp = MB_132;
-	asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));	
-	/*
 	asm ("movl %%esp, %0;"
      :"=r"(pcblock.esp)       
      );
-	 */
+	asm volatile("movl %%ebp, %0" 
+	: "=a"(pcblock.ret_ebp)
+	:
+	: "cc" );
+	asm volatile("movl %0, %%esp" : : "r"(MB_132));	
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = pcblock.esp;
+	tss.esp0 = MB_132;
 	asm volatile("              \n\
 		cli 				\n\
 		movw  %0, %%ax      \n\
@@ -76,7 +88,6 @@ int32_t execute (const uint8_t* command)
 		: "g"(USER_DS), "g"(MB_132 - 4), "g"(USER_CS), "g"(eip)
 		: "eax", "memory"
 	);
-	
 	
 	return 0;
 }
