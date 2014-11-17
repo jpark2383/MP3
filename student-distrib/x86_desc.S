@@ -151,4 +151,3 @@ _task2_page_directory:
 	.rept NUM_ENTRIES_PD
 	.long 0
 	.endr
-		

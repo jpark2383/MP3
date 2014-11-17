@@ -171,13 +171,14 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  * System call for open
  * INPUT: const uint8_t* filename: file to be opened
  * OUTPUT: None
- * RETURN: File descriptor of file opened
+ * RETURN: File descriptor index of file opened, returns -1 on failure
  */
  int32_t open (const uint8_t* filename)
  {
-//	int taken = 1;
 	int pid = 0;
 	pid = find_pid();
+	int index_temp;
+	fd_index = FD_MIN;
 	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*pid - START);
 	//if filename is invalid, return -1
 	if(filename == NULL)
@@ -185,19 +186,29 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		return -1;
 	}
 	//Iterate through the array to find an unused fd.
-	for(fd_index = FD_MIN; fd_index < FILE_ARRAY_SIZE; fd_index++)
+	for(; fd_index < FILE_ARRAY_SIZE; fd_index++)
 	{
 		if(pcblock.file_struct[fd_index].flags == 0)
 		{
-//			taken = 0;
-			break;
+			index_temp = fd_index;
 		}
 	}
+
+	//set the fd_index and set the flag for the file descriptor.
+	fd_index = index_temp;
 	pcblock.file_struct[fd_index].flags = 1;
+
 	//run filesystem_open to get the file type
 	filesystem_open(filename);
-	
-	//check the file type
+	//if open fails, return -1
+	if(filesystem_open(filename) == -1)
+	{
+		pcblock.file_struct[fd_index].flags = 0;
+		memcpy(pcb_ptr, &pcblock, pcb_size);
+		return -1;
+	}
+
+	//check the file type, 0 = rtc.
 	if(pcblock.dentry[fd_index].file_type == 0)
 	{
 		fd_rtc = fd_index;
@@ -209,12 +220,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	}
 	else
 	{
-		if(filesystem_open(filename) == -1)
-		{
-			pcblock.file_struct[fd_index].flags = 0;
-			memcpy(pcb_ptr, &pcblock, pcb_size);
-			return -1;
-		}
 		pcblock.file_struct[fd_index].fpos = 0;
 		pcblock.file_struct[fd_index].fops_ptr = &filesystem_fops;
 		memcpy(pcb_ptr, &pcblock, pcb_size);
