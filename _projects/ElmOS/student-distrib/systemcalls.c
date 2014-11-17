@@ -47,10 +47,14 @@ int32_t execute (const uint8_t* command)
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
 	for(i = 2; i <= 7; i++)
 		pcblock.file_struct[i].flags= 0;
-	//get the esp	
+	//get the esp
+	pcblock.esp = 0x8400000;
+	asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));	
+	/*
 	asm ("movl %%esp, %0;"
      :"=r"(pcblock.esp)       
      );
+	 */
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = pcblock.esp;
 	asm volatile("              \n\
@@ -224,7 +228,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  * OUTPUT:
  * RETURN:
  */ 
- //This needs to be changed
 
  int find_pid()
  {
