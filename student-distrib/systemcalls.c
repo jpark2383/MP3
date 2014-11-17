@@ -48,7 +48,7 @@ int32_t execute (const uint8_t* command)
 	for(i = 2; i <= 7; i++)
 		pcblock.file_struct[i].flags= 0;
 	//get the esp
-	pcblock.esp = 0x8400000;
+	pcblock.esp = MB_132;
 	asm volatile("movl %0, %%esp" : : "r"(pcblock.esp));	
 	/*
 	asm ("movl %%esp, %0;"
@@ -111,7 +111,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	{
 		return -1;
 	}
-	printf("got here\n");
+	//printf("got here\n");
 	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
 }
 

@@ -6,6 +6,7 @@
 //declare arrays and variabls for text, history, counter, newline detector
 unsigned char text_buf[BUF_MAX];
 unsigned int counter;
+int entered = 0;
 //int newline = 0;
 
 /*
@@ -150,6 +151,7 @@ void keyboard_read(unsigned char keystroke)
 		{
 			text_buf[counter] = keystroke;
 			counter = 0;
+			entered = 1;
 			//newline = 1;
 		}
 		//set_cursor(0, y + 1);
@@ -214,11 +216,14 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 		/*if(newline == 1)
 		{*/
 			//printf("got to line 208\n");
+		if(entered == 1)
+		{
 			int i = 0;
 			int ret_val;
 			//clear the buffer
-			for(i = 0; i < length; i++)
-				buf[i] = NULL;
+			/*this might screw us up later*/
+			//for(i = 0; i < length; i++)
+				//buf[i] = NULL;
 			//set new buffer values
 			for(i = 0; (i < length) && (i < BUF_MAX); i++)
 			{
@@ -230,10 +235,9 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 					break;
 				}
 			}
-			// reset keys entered
-			//newline = 0;
+			entered = 0;
 			return ret_val;
-		//}
+		}
 	}
 }
 
@@ -327,7 +331,7 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  */
 int32_t terminal_write(int32_t fd, const void* buf, int32_t len)
 {
-	printf("terminal write called\n");
+	//printf("terminal write called\n");
 	if (fd == 0) return -1;
 	return write_helper((uint8_t*)buf, len);
 }
