@@ -45,6 +45,9 @@
 #define DELETE				92
 #define CTRL_L				0xFF
 #define CTRL_C				0xF8
+#define CTRL_1				0xF1
+#define CTRL_2				0xF2
+#define CTRL_3				0xF3
 #define CTRL_ALT			0xF9
 #define TAB					0xFE
 #define LEFT_SHIFT_R		0xAA

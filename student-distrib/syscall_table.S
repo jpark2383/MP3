@@ -16,13 +16,12 @@ syscall_handler:
 	pushw %ds
 	pushw %fs
 	pushw %gs
-	pushl %ebx
 	pushl %ebp
-	pushl %ecx
 	pushl %edi
-	pushl %edx
 	pushl %esi
-	
+	pushl %edx
+	pushl %ecx
+	pushl %ebx
 	/* what is this part */
 	pushl %eax
 	movw $0x18, %ax
@@ -37,19 +36,14 @@ syscall_handler:
 	
 	/* dispatch to jump table */
 	jmp *system_call_table(, %eax, 4)
-	
-
-invalid_sysno:
-	movl $-1, %eax
-	jmp exit
 
 exit:
-	popl %esi
-	popl %edx
-	popl %edi
-	popl %ecx
-	popl %ebp
 	popl %ebx
+	popl %ecx
+	popl %edx
+	popl %esi
+	popl %edi
+	popl %ebp
 	popw %gs
 	popw %fs
 	popw %ds
@@ -57,6 +51,9 @@ exit:
 	addl $4, %esp
 	iret				/* interrupt return */
 
+invalid_sysno:
+	movl $-1, %eax
+	jmp exit
 
 /* jump table for system calls */
 system_call_table:
@@ -103,7 +100,4 @@ sys_close:				/* fd */
 	call	close
 	addl  	$4, %esp
 	jmp		exit
-
-
-
 

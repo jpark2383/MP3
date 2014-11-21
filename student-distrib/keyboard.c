@@ -109,12 +109,15 @@ unsigned char read_keyboard()
 			if(ctrl_flag == 1) // control is pressed
 			{
 				switch(code){
-					case 'c': charval = CTRL_C; //Doesn't matter right now
+					case 'c': charval = CTRL_C; //interrupt
 					case 'l': charval = CTRL_L; //Special CTRL_L value
+					case '1': charval = CTRL_1; //first terminal
+					case '2': charval = CTRL_2; //second terminal
+					case '3': charval = CTRL_3; //thrid terminal
 					default: break;
 				}
 			}
-			else if((code <= 'z') && code >= 'a') //If it is a letter
+			else if((code <= 'z') && (code >= 'a')) //If it is a letter
 			{
 				if(shift_flag == caps_flag) // lowercase letter
 					charval = code;

@@ -114,11 +114,11 @@ void keyboard_read(unsigned char keystroke)
 			set_cursor(x + 1, y);
 		else if((x < counter) && (x == 79))
 			set_cursor(0, y + 1);
-	}
+	}*/
 	else if (keystroke == CTRL_C)
 	{
 		send_eoi(PIC_8);
-	}*/
+	}
 	else if(keystroke == CTRL_L) //ctrl + l clears the screen
 	{
 		clear();
