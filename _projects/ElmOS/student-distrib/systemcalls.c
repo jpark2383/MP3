@@ -12,7 +12,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-
+uint32_t tasks[3] = {1,0,0}; //For the future, this will be 7
 
 
 /*
@@ -26,12 +26,12 @@ int32_t halt (uint8_t status)
 {
 
 	//try to halt from shell, restart shell
-	if(pc <= 1)
+	if(find_pid() == 1)
 	{
-		uint8_t filename[] = "shell";
-		execute(filename);
+		return 0;
 	}
-	asm volatile ("mov %0, %%CR3":: "b"(pcblock.ret_pd));
+	pcblock = *(pcblock.prev_pcb);
+	asm volatile ("movl %0, %%CR3":: "b"(pcblock.cr3));
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = pcblock.esp;	
 	asm volatile("              \n\
@@ -47,7 +47,7 @@ int32_t halt (uint8_t status)
 		iret 				\n\
 		"
 		:
-		: "g"(KERNEL_DS), "g"(pcblock.esp), "g"(KERNEL_CS), "g"(pcblock.eip), "g"(pcblock.ret_ebp)
+		: "g"(KERNEL_DS), "g"(pcblock.esp), "g"(KERNEL_CS), "g"(pcblock.eip), "g"(pcblock.ebp)
 		: "eax"
 		);
 	return 0;
@@ -66,15 +66,31 @@ int32_t halt (uint8_t status)
  * RETURN: 0 on success
  */
 int32_t execute (const uint8_t* command)
-{
-	uint32_t eip = 0;
+{	uint32_t eip = 0;
+	uint32_t new_pid = 7;
 	int i;
 	if(command == NULL)
 		return -1;
 	eip = loader(command);
 	if(eip == -1)
 		return -1;
-	//enable terminal
+	switch(find_pid())
+	{
+		case 0: break; //wtf start over. you suck
+	}	for(i = 0; i < 3; i++)
+	{
+		if(tasks[i] == 0)
+		{
+			new_pid = i;
+			tasks[i] = 1;
+			break;
+		}
+	}
+	if(new_pid == 7 || !new_pid)
+	{
+		write(1, "terrible terrible damage", 24); // All processes taken
+		return -1;
+	}	//enable terminal
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
@@ -82,22 +98,40 @@ int32_t execute (const uint8_t* command)
 	//mark all other file struct as unoccupied 
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
-	
-	asm volatile ("mov %%CR3, %0": "=b"(pcblock.ret_pd));
+	//save paging
+	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
+	//put in page directory of new task
+	//asm volatile ("movl %0, %%CR3":: "i"())
 	//get the esp
-	asm ("movl %%esp, %0;"
-     :"=r"(pcblock.esp)       
+	asm volatile("movl %%esp, %0"
+     :"=r"(pcblock.esp)
      );
 	asm volatile("movl %%ebp, %0" 
-	: "=a"(pcblock.ret_ebp)
+	: "=a"(pcblock.ebp)
 	:
 	: "cc" );
-	asm volatile("movl %0, %%esp" : : "r"(MB_132));	
+	//asm volatile("movl %0, %%esp" : : "r"(MB_132));
 	asm volatile("movl $halt_pos, %0" 
 	: "=a"(pcblock.eip)
 	:
 	: "cc" );
-
+	pcb_t new_pcb = pcblock;
+	new_pcb.prev_pcb = &pcblock;
+	pcblock = new_pcb;
+	pcblock.pid = new_pid;
+	switch(new_pid)
+	{
+		case 1:
+			pcblock.cr3 = (uint32_t)task1_page_directory;
+			break;
+		case 2:
+			pcblock.cr3 = (uint32_t)task2_page_directory;
+			break;
+		default:
+			write(1, "You done goofed", 15); //Error level over 9000
+			return -1;
+	}
+	asm volatile("movl %0, %%CR3":: "r"(pcblock.cr3));
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = MB_132 - KB_8;
 	//counter++;
@@ -164,7 +198,6 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	{
 		return -1;
 	}
-	//printf("got here\n");
 	return pcblock.file_struct[fd].fops_ptr->fops_write(fd, buf, nbytes);
 }
 
@@ -290,11 +323,13 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  int find_pid()
  {
 		uint32_t cr3;
-		asm volatile ("mov %%CR3, %0": "=b"(cr3));
+		asm volatile ("movl %%CR3, %0": "=b"(cr3));
 		if(cr3==(uint32_t)page_directory)
 			return 0;
 		if(cr3==(uint32_t)task1_page_directory)
 			return 1;
+		if(cr3==(uint32_t)task2_page_directory)
+			return 2;
 		return -1;
  }
 
