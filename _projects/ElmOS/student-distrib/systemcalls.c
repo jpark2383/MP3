@@ -12,7 +12,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[3] = {1,0,0}; //For the future, this will be 7
+uint32_t tasks[3] = {0,0,0}; //For the future, this will be 7
 
 
 /*
@@ -63,10 +63,11 @@ int32_t execute (const uint8_t* command)
 	eip = loader(command);
 	if(eip == -1)
 		return -1;
-	switch(find_pid())
+	/*switch(find_pid())
 	{
 		case 0: break; //wtf start over. you suck
-	}	for(i = 0; i < 3; i++)
+	}	*/
+	for(i = 0; i < 3; i++)
 	{
 		if(tasks[i] == 0)
 		{
@@ -104,6 +105,9 @@ int32_t execute (const uint8_t* command)
 	pcblock.pid = new_pid;
 	switch(new_pid)
 	{
+		case 0:
+			pcblock.cr3 = (uint32_t)page_directory;
+			break;
 		case 1:
 			pcblock.cr3 = (uint32_t)task1_page_directory;
 			break;
