@@ -55,7 +55,7 @@ invalid_sysno:
 
 /* jump table for system calls */
 system_call_table:
-.long sys_empty, sys_halt, sys_execute, sys_read, sys_write, sys_open, sys_close, sys_getargs, sys_vidmap, sys_set_handler, sys_sigreturn, 
+.long sys_empty, sys_halt, sys_execute, sys_read, sys_write, sys_open, sys_close, sys_getargs, sys_vidmap, sys_set_handler, sys_sigreturn
 
 sys_empty:
 
@@ -124,3 +124,5 @@ sys_sigreturn:				/* void */
 	call	sigreturn
 	addl  	$4, %esp
 	jmp		exit
+	
+
