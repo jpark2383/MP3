@@ -23,6 +23,7 @@
 #define SDIN			0
 #define SDOUT			1
 #define MAX_FD			7
+#define CMD_LEN			40
 //declaration of process control block.
 /*typedef struct __attribute__((packed)) pcb_t
 {
@@ -56,8 +57,8 @@ struct pcb_t
 	
 	dentry_t dentry[8];
 	//uint32_t signal;
-	uint8_t cmd_name[40];
-	uint8_t arg_name[40];
+	uint8_t cmd_name[CMD_LEN];
+	uint8_t arg_name[CMD_LEN];
 	uint8_t data_arg_size;
 };
 

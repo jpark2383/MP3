@@ -12,6 +12,9 @@
 #define BYTES_64 16
 #define BYTES_4K 1024
 #define MAX_FILE 62
+#define B_1 1
+#define B_2 2
+#define B_3 3
 #define B_4 4
 #define B_8 8 
 #define B_32 32
@@ -20,6 +23,9 @@
 #define B_36 36
 #define B_40 40
 #define B_64 64
+#define S_27 27
+#define S_26 26
+#define S_25 25
 #define MAGIC_NUM_1  0x7f
 #define MAGIC_NUM_2  0x45
 #define MAGIC_NUM_3  0x4c
@@ -29,10 +35,10 @@
 //declartion of data entry struct
 typedef struct dentry
 {
-	uint8_t file_name[32];
+	uint8_t file_name[B_32];
 	uint32_t file_type;
 	uint32_t inode_number;
-	uint8_t reserved[24];
+	uint8_t reserved[B_24];
 } dentry_t;
 
 //declaration of filesystem struct
@@ -65,9 +71,9 @@ typedef struct file_struct
 
 fs_t filesystem;
 uint32_t * BOOT_BLOCK_PTR;
-dentry_t dentry[8];
+dentry_t dentry[B_8];
 dentry_t dentry1;
-file_struct_t file_struct[8];
+file_struct_t file_struct[B_8];
 uint32_t pc;
 
 extern void init_fs();

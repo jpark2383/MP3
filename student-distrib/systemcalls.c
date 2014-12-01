@@ -73,7 +73,7 @@ void parse_cmd(const uint8_t * input)
 	uint8_t switch_flag = 0;
 	input_length = strlen((int8_t*)input);
 
-	for(i = 0; i < 40; i++){
+	for(i = 0; i < CMD_LEN; i++){
 		pcblock.cmd_name[i] = NULL;
 		pcblock.arg_name[i] = NULL;
 	}
@@ -209,7 +209,7 @@ int32_t execute (const uint8_t* command)
 			pcblock.cr3 = (uint32_t)task2_page_directory;
 			break;
 		default:
-			write(1, "You done goofed", 15); //Error level over 9000
+			//write(1, "You done goofed", 15); //Error level over 9000
 			return -1;
 	}
 	/*set up TSS for kernel mode*/
