@@ -189,7 +189,7 @@ int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes)
 	fd_val = fd;
 	if(pcblock.dentry[fd].file_type == 1)
 	{
-		return dirread();
+		return dirread(fd, buf);
 	}
 	return read_data(pcblock.dentry[fd].inode_number, pcblock.file_struct[fd].fpos, buf, nbytes);
 }
@@ -218,12 +218,12 @@ int32_t dirclose(int32_t fd)
  *   DESCRIPTION: searches the directory entries for regular files
  *   INPUTS: none	
  *   RETURN VALUE: none
- *   SIDE EFFECTS: prints the dierectory to the terminal screen
+ *   SIDE EFFECTS: prints the directory to the terminal screen
  */
  
-int32_t dirread()
+int32_t dirread(int32_t fd, void* buf)
 {
-	uint32_t i , temp;
+	/*uint32_t i , temp;
 	uint8_t max_string[B_32];
 	uint8_t * currptr;
 	for(i = 0; i < filesystem.num_dir_entries; i++)
@@ -236,7 +236,24 @@ int32_t dirread()
 			printf("%s\n",max_string);
 		}
 	}
-	return 0;
+	return 0;*/
+	
+	if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
+		return 0;
+	
+	uint32_t temp;
+	//uint8_t max_string[B_32];
+	uint8_t * currptr;
+	
+	currptr = filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64);
+	temp = *(currptr + B_32);
+	if(temp){
+		memcpy(buf,currptr,B_32);
+	}
+		
+	pcblock.file_struct[fd].fpos++;
+	
+	return strlen(buf);	
 }
  /* 
  *   filesystem_write	
