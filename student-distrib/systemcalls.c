@@ -86,13 +86,13 @@ void parse_cmd(const uint8_t * input)
 		for(i = space_offset; i < input_length; i++)
 		{	
 			//if switch_flag = 0, we're reading the command
-			if(switch_flag == 0)
+			if(switch_flag == 0 && input[i] != ' ')
 			{
 				pcblock.cmd_name[cmd_size] = input[i];
 				cmd_size++;
 			}
 			//if switch_flag == 1, we're reading the argument
-			if(switch_flag == 1)
+			if(switch_flag == 1 && input[i] != ' ')
 			{
 				pcblock.arg_name[arg_size] = input[i];
 				arg_size++;
@@ -114,13 +114,13 @@ void parse_cmd(const uint8_t * input)
 		for(i = 0; i < input_length; i++)
 		{
 			//if switch_flag = 0, we're reading the command
-			if(switch_flag == 0)
+			if(switch_flag == 0 && input[i] != ' ')
 			{
 				pcblock.cmd_name[cmd_size] = input[i];
 				cmd_size++;
 			}
 			//if switch_flag == 1, we're reading the argument
-			if(switch_flag == 1)
+			if(switch_flag == 1 && input[i] != ' ')
 			{
 				pcblock.arg_name[arg_size] = input[i];
 				arg_size++;
