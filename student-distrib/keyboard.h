@@ -51,7 +51,7 @@
 #define CTRL_ALT			0xF9
 #define TAB					0xFE
 #define LEFT_SHIFT_R		0xAA
-#define RIGHT_SHIFT_R		0xB8
+#define RIGHT_SHIFT_R		0xB6
 #define CTRL_RELEASE		0x9D
 #define ALT_RELEASE			0xBA
 
