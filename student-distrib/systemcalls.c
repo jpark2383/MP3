@@ -6,6 +6,7 @@
 #include "x86_desc.h"
 #include "pagefile.h"
 
+
 //global variable for the rtc file descriptor.
 int fd_rtc = 0;
 //declartions of file ops for the rtc, terminal, and filesystem.
@@ -71,7 +72,7 @@ void parse_cmd(const uint8_t * input)
 		pcblock.cmd_name[i] = NULL;
 		pcblock.arg_name[i] = NULL;
 	}
-	printf("in parse command\n");
+	//printf("in parse command\n");
 	//check if the first character is a space
 	if (input[0] == ' ')
 	{
@@ -105,7 +106,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
-		printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
+		//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
 	}
 	//in the event that the first character is not a space
 	else
@@ -133,7 +134,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
-		printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
+		//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
 	}
 }
 
@@ -294,6 +295,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		if(pcblock.file_struct[fd_index].flags == 0)
 		{
 			index_temp = fd_index;
+			break;
 		}
 	}
 
@@ -302,7 +304,9 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	pcblock.file_struct[fd_index].flags = 1;
 
 	//run filesystem_open to get the file type
-	filesystem_open(filename);
+	//filesystem_open(filename);
+	if((strncmp((const int8_t*)filename, (const int8_t*)"" , 1)) != 0)
+		read_dentry_by_name(filename, &pcblock.dentry[fd_index]);
 	//if open fails, return -1
 	if(filesystem_open(filename) == -1)
 	{
@@ -409,23 +413,43 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  */
 int32_t getargs (uint8_t* buf, int32_t nbytes)
 {
-
+/*
 	uint32_t i;
+	
+	//printf("in getargs\n");
 	
 	if(buf == NULL || nbytes < 0 || nbytes < pcblock.data_arg_size)
 	{
 		return -1;
 	}
-
+*/
 	/* nbytes specifies the length of buf */
 	/* clear buf */
+	/*
 	for(i=0; i<nbytes; i++)
 	{
 		buf[i]=NULL;
 	}
 	
+	//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
 	memcpy(buf,pcblock.arg_name,pcblock.data_arg_size);
 	
+	return 0;
+	*/
+	uint32_t i;
+	if(buf == NULL || nbytes <0)
+	{
+		return -1;
+	}
+	for(i=0;i<1024;i++)
+	{
+		buf[i]=NULL;
+	}
+	if(pcblock.data_arg_size<nbytes)
+		memcpy(buf,pcblock.arg_name,pcblock.data_arg_size);
+	else
+		memcpy(buf,pcblock.arg_name,nbytes);
+		
 	return 0;
 }
 /*

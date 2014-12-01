@@ -1,5 +1,6 @@
 #include "filesystem.h"
-
+#include "systemcalls.h"
+int fd_val;
 /* 
  *   filesystem_init
  *   DESCRIPTION: Initializes the filesystem driver
@@ -14,10 +15,8 @@ void init_fs()
    filesystem.num_data_blocks = *(BOOT_BLOCK_PTR + BYTES_8);
    filesystem.dentry_begin = (uint8_t *)(BOOT_BLOCK_PTR + BYTES_64);
    filesystem.data_start = BOOT_BLOCK_PTR + (filesystem.num_inodes+1)*BYTES_4K;
-   pc =0;
+   pc = 0;
 }
-
-
 /* 
  *   read_dentry_by_name
  *   DESCRIPTION: searches the directory entries for the filename and sends back the dentry.
@@ -40,7 +39,6 @@ int32_t read_dentry_by_name (const uint8_t* fname, dentry_t* dentry)
 	}
 	return -1;
 }
-
 /* 
  *   read_dentry_by_index
  *   DESCRIPTION: searches the directory entries for the inode_index and sends back the dentry.
@@ -63,7 +61,6 @@ int32_t read_dentry_by_index (uint32_t index, dentry_t* dentry)
 	}
 	return -1;
 }
-
 /* 
  * 	 read_data
  *   DESCRIPTION: reads the datablock specified in the inode in the dentry.
@@ -83,13 +80,11 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*BYTES_4K));
 	uint8_t * temp_buf = buf;
 	int i;
-
 	// clears the buffer
 	for(i = 0; i < length; i++)
 	{
 		buf[i] = 0;
 	}
-
 	//checks if inode index is valid
 	if(inode < 0 || inode >= (filesystem.num_inodes - 1))
 	{
@@ -144,11 +139,10 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 			remaining = 0;
 		}
 	}
-	
+	pcblock.file_struct[fd_val].fpos = offset + ret_val;
 	return ret_val;
 	
 }
-
 /* 
  * filesystem_open
  *   DESCRIPTION: filesytem's open function
@@ -159,11 +153,10 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 int32_t filesystem_open(const uint8_t* filename)
 {
 	if((strncmp((const int8_t*)filename, (const int8_t*)"" , 1)) != 0)
-		return read_dentry_by_name(filename, &dentry[0]);
+		return read_dentry_by_name(filename, &pcblock.dentry[0]);
 	else
 		return -1;
 }
-
 /* 
  * filesystem_close
  *   DESCRIPTION: filesytem's close function
@@ -175,7 +168,6 @@ int32_t filesystem_close(int32_t fd)
 {
 	return 0;
 }
-
 /* 
  * filesystem_read
  *   DESCRIPTION: filesytem's read function
@@ -185,11 +177,12 @@ int32_t filesystem_close(int32_t fd)
  */
 int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes)
 {
-	if(dentry[fd].file_type == 1)
+	fd_val = fd;
+	if(pcblock.dentry[fd].file_type == 1)
 	{
 		return dirread();
 	}
-	return read_data(dentry[fd].inode_number, 0, buf, nbytes);
+	return read_data(pcblock.dentry[fd].inode_number, pcblock.file_struct[fd].fpos, buf, nbytes);
 }
  /* 
  * filesystem_write	
@@ -202,18 +195,15 @@ int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes)
 {
     return -1;
 }
-
 int32_t diropen(const uint8_t* filename)
 {
     return 0;
 }
-
 int32_t dirclose(int32_t fd)
 {
     return 0;
     
 }
-
 /* 
  *   dirread
  *   DESCRIPTION: searches the directory entries for regular files
@@ -239,7 +229,6 @@ int32_t dirread()
 	}
 	return 0;
 }
-
  /* 
  *   filesystem_write	
  *   DESCRIPTION: directory write function
@@ -252,7 +241,6 @@ int32_t dirwrite()
 {
 	return -1;
 }
-
 /*
  *   loader
  *   DESCRIPTION: check if the file is executable, if it is load it in programming memory
@@ -260,9 +248,7 @@ int32_t dirwrite()
  *   RETURN VALUE: eip if success, -1 if fail 
  *   SIDE EFFECTS: does nothing
 *
-
 */
-
 int loader(const uint8_t* filename)
 {
     uint32_t inode, data_length, block_num, eip;
@@ -302,5 +288,3 @@ int loader(const uint8_t* filename)
 		return -1;
 	}
 }
-
-
