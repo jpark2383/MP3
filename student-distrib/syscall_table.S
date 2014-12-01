@@ -7,6 +7,10 @@
 .global write
 .global open
 .global close
+.global getargs
+.global vidmap
+.global set_handler
+.global sigreturn
 
 syscall_handler:
 
@@ -22,12 +26,6 @@ syscall_handler:
 	pushl %edx
 	pushl %ecx
 	pushl %ebx
-	/* what is this part */
-	pushl %eax
-	movw $0x18, %ax
-	movw %ax, %ds
-	popl %eax
-	
 	/* validity check on system call number */
 	cmpl $0, %eax
 	jbe  invalid_sysno
@@ -57,7 +55,7 @@ invalid_sysno:
 
 /* jump table for system calls */
 system_call_table:
-.long sys_empty, sys_halt, sys_execute, sys_read, sys_write, sys_open, sys_close
+.long sys_empty, sys_halt, sys_execute, sys_read, sys_write, sys_open, sys_close, sys_getargs, sys_vidmap, sys_set_handler, sys_sigreturn, 
 
 sys_empty:
 
@@ -100,4 +98,29 @@ sys_close:				/* fd */
 	call	close
 	addl  	$4, %esp
 	jmp		exit
+	
+sys_getargs:				/* buf, nbytes */
+	pushl 	%ecx
+	pushl 	%ebx
+	call	getargs
+	addl  	$8, %esp
+	jmp		exit
 
+sys_vidmap:				/* screen_start */
+	pushl 	%ebx
+	call	vidmap
+	addl  	$4, %esp
+	jmp		exit
+
+sys_set_handler:				/* signum, handler_address */
+	pushl 	%ecx
+	pushl 	%ebx
+	call	set_handler
+	addl  	$8, %esp
+	jmp		exit
+	
+sys_sigreturn:				/* void */
+	pushl 	%ebx
+	call	sigreturn
+	addl  	$4, %esp
+	jmp		exit

@@ -138,7 +138,6 @@ _task1_page_directory:
 	.long 0
 	.endr
 	
-	
 page_table2:
 _page_table2:
 	.rept NUM_ENTRIES_PT

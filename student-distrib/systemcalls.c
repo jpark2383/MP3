@@ -401,21 +401,23 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  */
 int32_t getargs (uint8_t* buf, int32_t nbytes)
 {
-/*
+
 	uint32_t i;
-	if(buf == NULL || nbytes <0)
+	
+	if(buf == NULL || nbytes < 0 || nbytes < pcblock.data_arg_size)
 	{
 		return -1;
 	}
-	for(i=0;i<BYTES_4K;i++)
+
+	/* nbytes specifies the length of buf */
+	/* clear buf */
+	for(i=0; i<nbytes; i++)
 	{
 		buf[i]=NULL;
 	}
-	if(pcba.argd_size<nbytes)
-		memcpy(buf,pcblock.argd,pcblock.argd_size);
-	else
-		memcpy(buf,pcblock.argd,nbytes);
-	*/	
+	
+	memcpy(buf,pcblock.arg_name,pcblock.data_arg_size);
+	
 	return 0;
 }
 /*
@@ -435,14 +437,10 @@ int32_t vidmap(uint8_t** screen_start)
 
 int32_t set_handler (int32_t signum, void* handler)
 {
-	
 	return 0;
 }
 
 int32_t sigreturn (void)
 {
-	
 	return 0;
 }
-
-
