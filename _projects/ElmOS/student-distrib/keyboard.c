@@ -150,7 +150,7 @@ unsigned char read_keyboard()
 			ctrl_flag = 0;
 		else if(scancode == ALT_RELEASE) // On alt release
 			alt_flag = 0;
-		shift_flag = l_shift | r_shift;
+		shift_flag = l_shift || r_shift;
 		charval = NULL;
 	}
 	keyboard_read(charval);
