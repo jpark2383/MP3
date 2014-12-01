@@ -77,6 +77,7 @@ int32_t terminal_close(int32_t fd)
 void keyboard_read(unsigned char keystroke)
 {
 	//printf("keyboard_read called \n");
+	cli();
 	int i, j;			//declare variables for counters
 	int x = getx();
 	int y = gety();
@@ -171,11 +172,13 @@ void keyboard_read(unsigned char keystroke)
 		if(!strncmp((int8_t*)buf, (int8_t*)"391OS> ", BUF_MIN) && (x == BUF_MIN))
 		{
 			send_eoi(PIC_1);
+			sti();
 			return;
 		}
 		if(counter == 0)
 		{
 			send_eoi(PIC_1);
+			sti();
 			return;
 		}
 		setx(--x); //These lines delete the character
@@ -193,6 +196,7 @@ void keyboard_read(unsigned char keystroke)
 		//set_cursor(x + 1, y);
 		counter ++;
 	}
+	sti();
 	return;
 }
 
@@ -255,6 +259,7 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  int32_t write_helper(const uint8_t* text, int32_t length)
  {
  	//printf("write_helper called \n");
+ 	cli();
  	int i, j, k;
  	int x = getx();
  	int y = gety();
@@ -265,28 +270,7 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  		return -1;
  	for(k = 0; k < length; k++)
  	{
-		/*if(y >= HEIGHT - 1)
-		{
-			printf("line 256\n");
-			for(i = 0; i < HEIGHT; i++)
-			{
-				for(j = 0; j < WIDTH; j++)
-					text_hist[i][j] = get_char(j, i);
-			}
-			clear();
-			set_cursor(0,0);
-			for(i = 1; i < HEIGHT; i++)
-			{
-				for(j = 0; j < WIDTH; j++)
-				{
-					set_cursor(0,i - 1);
-					putc(text_hist[i][j]);
-				}
-			}
-			set_cursor(0,y);
-		}*/
 		x = getx();
-
 		y = gety();
 		if(y >= HEIGHT - 1) //This is similar to the case in keyboard_read for page bottom
 		{
@@ -320,10 +304,11 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  		{
  			putc(text[k]); //Print the character
  		}
- 		if((x == WIDTH - 1) && (text[k + 1] != '\n'))
+ 		if((x == WIDTH ) && (text[k + 1] != '\n'))
  			putc('\n'); //Newline at end of line
  	}
  	set_cursor(getx(), gety());
+ 	sti();
  	return i+1;
  }
 
