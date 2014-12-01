@@ -295,7 +295,7 @@ int loader(const uint8_t* filename)
     uint32_t inode, data_length, block_num, eip;
 	uint32_t *inode_ptr;
 	uint32_t *block_ptr;
-	uint8_t buf[4];
+	uint8_t buf[B_4];
 	if(read_dentry_by_name(filename, &dentry1) == -1)
 		return  -1; //File not found
 	/*check if the file is executable*/
@@ -303,18 +303,18 @@ int loader(const uint8_t* filename)
 	inode_ptr = BOOT_BLOCK_PTR + (inode + 1) * BYTES_4K;
 	data_length = *(inode_ptr);
 	//check if data length is valid
-	if(data_length< 4)
+	if(data_length< B_4)
 		return -1;
 	block_num = *(inode_ptr + BYTES_4);
 	block_ptr = filesystem.data_start + block_num * BYTES_4K;
-	memcpy(buf, block_ptr, 4);
+	memcpy(buf, block_ptr, B_4);
 	/*executable*/
-	if(buf[0] == MAGIC_NUM_1 && buf[1] == MAGIC_NUM_2 && buf[2] ==MAGIC_NUM_3 && buf[3] == MAGIC_NUM_4)
+	if(buf[0] == MAGIC_NUM_1 && buf[B_1] == MAGIC_NUM_2 && buf[B_2] ==MAGIC_NUM_3 && buf[B_3] == MAGIC_NUM_4)
 	{
 		uint8_t data_buf[data_length];
 		read_data(dentry1.inode_number, 0, data_buf, data_length);
 		/*get the eip*/
-		eip = data_buf[27] << B_24 | data_buf[26] << B_16 | data_buf[25] << B_8  | data_buf[24];
+		eip = data_buf[S_27] << B_24 | data_buf[S_26] << B_16 | data_buf[S_25] << B_8  | data_buf[24];
 			if (pc ==0)
 				asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
 			else if (pc ==1)
