@@ -123,6 +123,7 @@ void keyboard_read(unsigned char keystroke)
 	{
 		clear();
 		set_cursor(0,0);
+		printf("391OS> ");
 	}
 	else if((x >= WIDTH - 1) || (keystroke == '\n')) // Case when we reach bottom of screen
 	{
@@ -185,7 +186,7 @@ void keyboard_read(unsigned char keystroke)
 		//counter--;
 	}
 	// These are all the actual characters. Save to buffer and write to screen.
-	else if((keystroke >= ' ') && (keystroke <= '~') && (counter < BUF_MAX))
+	else if((keystroke >= ' ') && (keystroke <= '~') && (counter < BUF_MAX - 1))
 	{
 		text_buf[counter] = keystroke;
 		putc(keystroke);
@@ -287,17 +288,17 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 		x = getx();
 
 		y = gety();
-		if(y >= HEIGHT) //This is similar to the case in keyboard_read for page bottom
+		if(y >= HEIGHT - 1) //This is similar to the case in keyboard_read for page bottom
 		{
 			
-			for(i = 0; i < HEIGHT; i++)
+			for(i = 0; i < HEIGHT - 1; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
 			clear();
 			//shift the screen
-			for(i = 1; i < HEIGHT; i++)
+			for(i = 1; i < HEIGHT - 1; i++)
 			{
 				set_cursor(0,i - 1);
 				for(j = 0; j < WIDTH; j++)
@@ -305,11 +306,15 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 					putc(text_hist[i][j]);
 				}
 			}
-			set_cursor(0, HEIGHT - 1);
+			set_cursor(0, HEIGHT - 2);
 		}
  		if(text[k] == NULL)
  		{
  			//Do nothing
+ 		}
+ 		else if (text[k] == '\n')
+ 		{
+ 			set_cursor(0, gety()+1);
  		}
  		else
  		{

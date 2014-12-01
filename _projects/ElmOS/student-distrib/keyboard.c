@@ -1,7 +1,7 @@
 #include "keyboard.h"
 
 // flags for shift, alt, caps, etc.
-int shift_flag = 0, alt_flag, caps_flag = 0, ctrl_flag, l_shift, r_shift;
+int shift_flag = 0, alt_flag, caps_flag = 0, ctrl_flag = 0, l_shift = 0, r_shift = 0;
 // handle numbers and lower case letters 
 unsigned char key_codes[90] = {
 0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 
@@ -109,11 +109,15 @@ unsigned char read_keyboard()
 			if(ctrl_flag == 1) // control is pressed
 			{
 				switch(code){
-					case 'c': charval = CTRL_C; //interrupt
-					case 'l': charval = CTRL_L; //Special CTRL_L value
-					case '1': charval = CTRL_1; //first terminal
+					case 'c': 
+						charval = CTRL_C; //interrupt
+						break;
+					case 'l': 
+						charval = CTRL_L; //Special CTRL_L value
+						break;
+					/*case '1': charval = CTRL_1; //first terminal
 					case '2': charval = CTRL_2; //second terminal
-					case '3': charval = CTRL_3; //thrid terminal
+					case '3': charval = CTRL_3; //thrid terminal*/
 					default: break;
 				}
 			}
@@ -140,13 +144,13 @@ unsigned char read_keyboard()
 	{
 		if(scancode == LEFT_SHIFT_R) // On left shift release
 			l_shift = 0;
-		if(scancode == RIGHT_SHIFT_R) // On right shift release
+		else if(scancode == RIGHT_SHIFT_R) // On right shift release
 			r_shift = 0;
-		shift_flag = l_shift | r_shift;
-		if(scancode == CTRL_RELEASE) // On ctrl release
+		else if(scancode == CTRL_RELEASE) // On ctrl release
 			ctrl_flag = 0;
-		if(scancode == ALT_RELEASE) // On alt release
+		else if(scancode == ALT_RELEASE) // On alt release
 			alt_flag = 0;
+		shift_flag = l_shift | r_shift;
 		charval = NULL;
 	}
 	keyboard_read(charval);
