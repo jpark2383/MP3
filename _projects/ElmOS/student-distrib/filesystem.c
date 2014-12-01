@@ -240,20 +240,19 @@ int32_t dirread(int32_t fd, void* buf)
 	return strlen(currptr);	*/
 	
 	uint32_t temp = 0;
-	uint8_t * currptr;
-	
+	int8_t* currptr;
+		
 	if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
 		return 0;
 	else{
 		while(!temp){
-			currptr = filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64);
+			currptr = (int8_t*)(filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64));
 			temp = *(currptr + B_32);
 			pcblock.file_struct[fd].fpos++;	
 		}
 		memcpy(buf,currptr,strlen(currptr));		
 		return strlen(currptr);
 	}
-	return strlen(currptr);
 }
  /* 
  *   filesystem_write	
