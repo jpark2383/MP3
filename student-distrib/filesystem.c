@@ -166,6 +166,15 @@ int32_t filesystem_open(const uint8_t* filename)
  */
 int32_t filesystem_close(int32_t fd)
 {
+	fd_val = fd;
+	if(pcblock.dentry[fd].file_type == 1)
+	{
+		return dirclose(fd);
+	}
+	
+	if (fd == 0 || fd == 1)
+		return -1;
+	pcblock.file_struct[fd].flags = 0;
 	return 0;
 }
 /* 
