@@ -29,7 +29,7 @@ syscall_handler:
 	/* validity check on system call number */
 	cmpl $0, %eax
 	jbe  invalid_sysno
-	cmpl $6, %eax
+	cmpl $11, %eax
 	jae	 invalid_sysno
 	
 	/* dispatch to jump table */
