@@ -290,7 +290,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		return -1;
 	}
 	//Iterate through the array to find an unused fd.
-	for(; fd_index < FILE_ARRAY_SIZE; fd_index++)
+	for(; fd_index <= FILE_ARRAY_SIZE; fd_index++)
 	{
 		if(pcblock.file_struct[fd_index].flags == 0)
 		{
@@ -298,6 +298,9 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 			break;
 		}
 	}
+	/* if fd is full, return -1 */
+	if (fd_index == FILE_ARRAY_SIZE)
+		return -1;
 
 	//set the fd_index and set the flag for the file descriptor.
 	fd_index = index_temp;
@@ -406,36 +409,13 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  }
 /*
  * getargs()
- * get the argument of the command
- * INPUT: buf, the input buffer to be copied, nbytes, length you want to copy
- * OUTPUT: on succeed, return 0, else, return -1
- * RETURN: copy the command to the buf. 
+ * get the argument from terminal input
+ * INPUT: buf -> copy into here; nbytes -> # of bytese to copy
+ * OUTPUT: return 0 when successful, else return -1
+ * RETURN: copy the argument into the buffer. 
  */
 int32_t getargs (uint8_t* buf, int32_t nbytes)
 {
-/*
-	uint32_t i;
-	
-	//printf("in getargs\n");
-	
-	if(buf == NULL || nbytes < 0 || nbytes < pcblock.data_arg_size)
-	{
-		return -1;
-	}
-*/
-	/* nbytes specifies the length of buf */
-	/* clear buf */
-	/*
-	for(i=0; i<nbytes; i++)
-	{
-		buf[i]=NULL;
-	}
-	
-	//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
-	memcpy(buf,pcblock.arg_name,pcblock.data_arg_size);
-	
-	return 0;
-	*/
 	uint32_t i;
 	if(buf == NULL || nbytes <0)
 	{
