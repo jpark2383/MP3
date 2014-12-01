@@ -183,6 +183,7 @@ entry (unsigned long magic, unsigned long addr)
 	//write(1, "abcdefghijklmnopqrstuvwxyz", 26);
 	/*
 	printf("testing terminal \n");*/
+
 	/*
 	unsigned char buf[4000] = "!@#$QWE^&*()1234567890\n";
 	terminal_write(1, buf, 4000);
@@ -228,9 +229,9 @@ entry (unsigned long magic, unsigned long addr)
 	//dirread();
 	
 	/* Execute the first program (`shell') ... */
+
 	uint8_t filename[] = "shell";	
 	execute(filename);
-	
 	
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
