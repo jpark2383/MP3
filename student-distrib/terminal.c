@@ -137,7 +137,7 @@ void keyboard_read(unsigned char keystroke)
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
-			//clear();
+			clear();
 			//shift the display up one position
 			for(i = 1; i < HEIGHT; i++)
 			{
@@ -275,14 +275,20 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 		if(y >= HEIGHT - 1) //This is similar to the case in keyboard_read for page bottom
 		{
 			
-			for(i = 0; i < HEIGHT - 1; i++)
+			for(i = 0; i < HEIGHT; i++)
 			{
 				for(j = 0; j < WIDTH; j++)
+				{
 					text_hist[i][j] = get_char(j, i);
+					if(i >= HEIGHT - 1)
+					{
+						text_hist[i][j] = 32;
+					}
+				}
 			}
 			//clear();
 			//shift the screen
-			for(i = 1; i < HEIGHT - 1; i++)
+			for(i = 1; i < HEIGHT; i++)
 			{
 				set_cursor(0,i - 1);
 				for(j = 0; j < WIDTH; j++)
