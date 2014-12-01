@@ -185,8 +185,7 @@ entry (unsigned long magic, unsigned long addr)
 	printf("testing terminal \n");*/
 
 	/*
-	unsigned char buf[4000] = "!@#$QWE^&*()1234567890\n";
-	terminal_write(1, buf, 4000);
+	unsigned char buf[4000] = "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n";
 	write(1, buf, 4000);
 	*/
 	/*unsigned char buf2[4000] = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\n";
@@ -232,7 +231,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	uint8_t filename[] = "shell";	
 	execute(filename);
-	
+
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
 }
