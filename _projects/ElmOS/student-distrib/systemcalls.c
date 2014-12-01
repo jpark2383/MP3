@@ -47,6 +47,89 @@ int32_t halt (uint8_t status)
 	
 }
 
+
+/*
+ * void parse_cmd(const uint8_t * command)
+ * Parses the command string and loads the pcb with the command and argument
+ * INPUT: const uint8_t command: command line string
+ * OUTPUT: NONE
+ * RETURN: NONE
+ * SIDE EFFECTS: pcb is loaded with arg size, cmd, and arg
+ */
+
+void parse_cmd(const uint8_t * input)
+{
+	int input_length = 0;
+	int cmd_size = 0;
+	int arg_size = 0;
+	int space_offset = 0;
+	int i = 0;
+	int switch_flag = 0;
+	input_length = strlen((int8_t*)input);
+
+	//check if the first character is a space
+	if (input[0] == ' ')
+	{
+		// count the amount of spaces before the first word
+		for(i = 0; i < input_length; i++)
+		{
+			if(input[i] == ' ')
+				space_offset++;
+		}
+
+		//read starting from the offset
+		for(i = space_offset; i < input_length; i++)
+		{	
+			//if switch_flag = 0, we're reading the command
+			if(switch_flag == 0)
+			{
+				pcblock.cmd_name[cmd_size] = input[i];
+				cmd_size++;
+			}
+			//if switch_flag == 1, we're reading the argument
+			if(switch_flag == 1)
+			{
+				pcblock.arg_name[arg_size] = input[i];
+				arg_size++;
+			}
+			//check if next character is a space after the first string
+			if(switch_flag == 0 && input[i + 1] == ' ')
+			{
+				switch_flag = 1;
+			}
+		}
+		//load the size of the arg into the pcb
+		pcblock.data_arg_size = arg_size;
+	}
+	//in the event that the first character is not a space
+	else
+	{
+		//iterate through the string and seperate the cmd from the arg.
+		for(i = 0; i < input_length; i++)
+		{
+			//if switch_flag = 0, we're reading the command
+			if(switch_flag == 0)
+			{
+				pcblock.cmd_name[cmd_size] = input[i];
+				cmd_size++;
+			}
+			//if switch_flag == 1, we're reading the argument
+			if(switch_flag == 0)
+			{
+				pcblock.arg_name[arg_size] = input[i];
+				arg_size++;
+			}
+			//check if next character is a space after the first string
+			if(switch_flag == 0 && input[i + 1] == ' ')
+			{
+				switch_flag = 1;
+			}
+		}
+		//load the size of the arg into the pcb
+		pcblock.data_arg_size = arg_size;
+	}
+}
+
 /*
  * int32_t execute (const uint8_t* command)
  * Starts a new process with the given command
