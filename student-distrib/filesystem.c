@@ -71,76 +71,92 @@ int32_t read_dentry_by_index (uint32_t index, dentry_t* dentry)
  
 int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
 {
-	uint32_t ret_val, remaining;
-	int num_block = offset/KB_4;
-	int block_index = offset % KB_4;
-	uint32_t *inode_ptr = BOOT_BLOCK_PTR + (inode+1)*BYTES_4K;
-	uint32_t data_length = *inode_ptr;
-	uint32_t block_number = *(inode_ptr + ((num_block +1) *BYTES_4));
-	uint8_t * block_ptr = (uint8_t *)(filesystem.data_start + ((block_number)*BYTES_4K));
-	uint8_t * temp_buf = buf;
-	int i;
-	// clears the buffer
-	for(i = 0; i < length; i++)
-	{
-		buf[i] = 0;
-	}
-	//checks if inode index is valid
-	if(inode < 0 || inode >= (filesystem.num_inodes - 1))
-	{
-		return -1;
-	}
-	//checks if the entire data is being read
-	if (offset >= data_length)
-	{
-		return 0;
-	}
-	
-	// This may or may not be right
-	if((offset+length) > data_length)
-	{
-		length = (data_length - offset);
-		ret_val = length;
-		remaining = length;
-	}
-	else
-	{
-		ret_val = length;
-		remaining = ret_val;
-	}
+
+	uint32_t *inode_ptr , data_length , index , i , block_num;
+	//uint8_t * temp;
+	uint32_t * block_ptr ;
+	uint8_t * block_p8tr;
+	uint8_t index_flag;
+	uint32_t rval , left;
+	uint8_t * bufholder;
+	/*clear the buffer first*/
+	for(i=0;i<length;i++)
+		buf[i]=0;
 		
-	//check if what's left is less than a block
-	if((block_index + remaining) <= KB_4)
+	bufholder=buf;
+
+	inode_ptr = BOOT_BLOCK_PTR + (inode + 1)*BYTES_4K;
+	data_length = *inode_ptr;
+	/*means it is read*/
+	if(offset>=data_length)
+		return 0;
+
+	if(inode < 0 || inode >= (filesystem.num_inodes-1) )  
+		return -1;
+
+	if((offset+length)>data_length)
 	{
-		memcpy(temp_buf,block_ptr,remaining);
-		remaining = 0;
+		length=(data_length-offset);
+		rval=length;
+		left=rval;
 	}
 	else
 	{
-		memcpy(temp_buf, block_ptr, (KB_4 - block_index));
-		remaining -= KB_4 - block_index;
-		temp_buf += KB_4 - block_index;
-		num_block++;
+		rval=length;
+		left=rval;
 	}
+	/*get the block num*/
+	i = offset/ONE_BLOCK_SIZE;
+	index = offset % ONE_BLOCK_SIZE;
+	index_flag=1;
 	
-	while(remaining > 0)
+
+	while(left>0)
 	{
-		// check if what's remaining is greater than 1 block
-		if(remaining >= KB_4)
+
+		block_num=* (inode_ptr + ((i+1)*BYTES_4) );
+		block_ptr=filesystem.data_start + (block_num)*BYTES_4K;
+		block_p8tr=(uint8_t *)block_ptr;
+		/*check to see if it is the first block*/
+		if(index_flag)
 		{
-			memcpy(temp_buf, block_ptr, KB_4);
-			remaining -= KB_4 - block_index;
-			temp_buf += KB_4 - block_index;
-			num_block++;
+			index_flag=0;
+			block_p8tr=block_p8tr+index;
+			if((index+left)<=ONE_BLOCK_SIZE)
+			{
+				memcpy(buf,block_p8tr,left);
+				left=0;
+			}	
+			else
+			{
+				memcpy(bufholder,block_p8tr,(ONE_BLOCK_SIZE-index));
+				left=left-(ONE_BLOCK_SIZE-index);
+				bufholder=bufholder+(ONE_BLOCK_SIZE-index);
+				i++;
+			}
 		}
-		if(remaining < KB_4)
+		/*keep reading the rest of the blocks*/
+		else
 		{
-			memcpy(temp_buf, block_ptr, remaining);
-			remaining = 0;
+			if(left>=ONE_BLOCK_SIZE)
+			{
+				memcpy(bufholder,block_p8tr,ONE_BLOCK_SIZE);
+				left=left-(ONE_BLOCK_SIZE-index);
+				bufholder=bufholder+(ONE_BLOCK_SIZE-index);
+				i++;
+			}
+			if(left<ONE_BLOCK_SIZE)
+			{
+				memcpy(bufholder,block_p8tr,left);
+				left=0;
+			}
+
+
 		}
+
 	}
-	pcblock.file_struct[fd_val].fpos = offset + ret_val;
-	return ret_val;
+	pcblock.file_struct[fd_val].fpos=offset+rval;
+	return rval;
 	
 }
 /* 

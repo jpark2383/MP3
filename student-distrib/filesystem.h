@@ -25,7 +25,7 @@
 #define MAGIC_NUM_3  0x4c
 #define MAGIC_NUM_4  0x46
 #define PROGRAM_IMG 0x08048000
-
+#define ONE_BLOCK_SIZE 4096
 //declartion of data entry struct
 typedef struct dentry
 {
