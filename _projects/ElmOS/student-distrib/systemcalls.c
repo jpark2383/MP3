@@ -59,14 +59,19 @@ int32_t halt (uint8_t status)
 
 void parse_cmd(const uint8_t * input)
 {
-	int input_length = 0;
-	int cmd_size = 0;
-	int arg_size = 0;
-	int space_offset = 0;
-	int i = 0;
-	int switch_flag = 0;
+	uint8_t input_length = 0;
+	uint8_t cmd_size = 0;
+	uint8_t arg_size = 0;
+	uint8_t space_offset = 0;
+	uint8_t i = 0;
+	uint8_t switch_flag = 0;
 	input_length = strlen((int8_t*)input);
 
+	for(i = 0; i < 40; i++){
+		pcblock.cmd_name[i] = NULL;
+		pcblock.arg_name[i] = NULL;
+	}
+	printf("in parse command\n");
 	//check if the first character is a space
 	if (input[0] == ' ')
 	{
@@ -100,6 +105,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
+		printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
 	}
 	//in the event that the first character is not a space
 	else
@@ -114,7 +120,7 @@ void parse_cmd(const uint8_t * input)
 				cmd_size++;
 			}
 			//if switch_flag == 1, we're reading the argument
-			if(switch_flag == 0)
+			if(switch_flag == 1)
 			{
 				pcblock.arg_name[arg_size] = input[i];
 				arg_size++;
@@ -127,6 +133,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
+		printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
 	}
 }
 
@@ -145,7 +152,8 @@ int32_t execute (const uint8_t* command)
 	int i;
 	if(command == NULL)
 		return -1;
-	eip = loader(command);
+	parse_cmd(command);
+	eip = loader(pcblock.cmd_name);
 	if(eip == -1)
 		return -1;
 	for(i = 0; i < 3; i++)
