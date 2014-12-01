@@ -137,7 +137,7 @@ void keyboard_read(unsigned char keystroke)
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
-			clear();
+			//clear();
 			//shift the display up one position
 			for(i = 1; i < HEIGHT; i++)
 			{
@@ -280,7 +280,7 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 				for(j = 0; j < WIDTH; j++)
 					text_hist[i][j] = get_char(j, i);
 			}
-			clear();
+			//clear();
 			//shift the screen
 			for(i = 1; i < HEIGHT - 1; i++)
 			{
