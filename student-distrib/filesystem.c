@@ -223,37 +223,37 @@ int32_t dirclose(int32_t fd)
  
 int32_t dirread(int32_t fd, void* buf)
 {
-	/*uint32_t i , temp;
-	uint8_t max_string[B_32];
-	uint8_t * currptr;
-	for(i = 0; i < filesystem.num_dir_entries; i++)
-    {
-		currptr = filesystem.dentry_begin + (i)*(B_64);
-		temp = *(currptr + B_32);
-		if(temp)
-		{
-			memcpy(max_string,currptr,B_32);
-			printf("%s\n",max_string);
-		}
-	}
-	return 0;*/
-	
-	if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
+	/*if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
 		return 0;
 	
 	uint32_t temp;
-	//uint8_t max_string[B_32];
 	uint8_t * currptr;
 	
 	currptr = filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64);
 	temp = *(currptr + B_32);
 	if(temp){
-		memcpy(buf,currptr,B_32);
+		memcpy(buf,currptr,strlen(currptr));
 	}
 		
 	pcblock.file_struct[fd].fpos++;
 	
-	return strlen(buf);	
+	return strlen(currptr);	*/
+	
+	uint32_t temp = 0;
+	uint8_t * currptr;
+	
+	if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
+		return 0;
+	else{
+		while(!temp){
+			currptr = filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64);
+			temp = *(currptr + B_32);
+			pcblock.file_struct[fd].fpos++;	
+		}
+		memcpy(buf,currptr,strlen(currptr));		
+		return strlen(currptr);
+	}
+	return strlen(currptr);
 }
  /* 
  *   filesystem_write	
