@@ -31,7 +31,7 @@ int32_t halt (uint8_t status)
 	}
 	pc = pc-1;
 	pcblock = *(pcblock.prev_pcb);
-	asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
+	asm volatile ("mov %0, %%CR3":: "r"(task1_page_directory));
 	tss.esp0 = EIGHT_MB -4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
@@ -63,10 +63,6 @@ int32_t execute (const uint8_t* command)
 	eip = loader(command);
 	if(eip == -1)
 		return -1;
-	/*switch(find_pid())
-	{
-		case 0: break; //wtf start over. you suck
-	}	*/
 	for(i = 0; i < 3; i++)
 	{
 		if(tasks[i] == 0)
@@ -80,7 +76,8 @@ int32_t execute (const uint8_t* command)
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
-	printf("%d", pc);
+	printf("pid is: %d\n", new_pid);
+	printf("pc is: %d\n", pc);
 	//mark all other file struct as unoccupied 
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
@@ -105,9 +102,6 @@ int32_t execute (const uint8_t* command)
 	pcblock.pid = new_pid;
 	switch(new_pid)
 	{
-		case 0:
-			pcblock.cr3 = (uint32_t)page_directory;
-			break;
 		case 1:
 			pcblock.cr3 = (uint32_t)task1_page_directory;
 			break;
@@ -191,6 +185,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  {
 	int pid = 0;
 	pid = find_pid();
+
 	int index_temp;
 	fd_index = FD_MIN;
 	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*pid - START);
