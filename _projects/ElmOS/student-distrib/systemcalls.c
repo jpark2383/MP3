@@ -29,6 +29,7 @@ int32_t halt (uint8_t status)
 	{
 		return 0;
 	}
+	tasks[find_pid()] = 0;
 	pc = pc-1;
 	pcblock = *(pcblock.prev_pcb);
 	asm volatile ("mov %0, %%CR3":: "r"(task1_page_directory));
@@ -39,6 +40,7 @@ int32_t halt (uint8_t status)
 	asm volatile("movl %0, %%ebp"::"g"(pcblock.ebp));
 	
 	asm volatile("popl %eax");
+	asm volatile("movl $0, %eax");
 	asm volatile("leave");
 	asm volatile("ret");
 	return 0;
@@ -76,8 +78,6 @@ int32_t execute (const uint8_t* command)
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
-	printf("pid is: %d\n", new_pid);
-	printf("pc is: %d\n", pc);
 	//mark all other file struct as unoccupied 
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
@@ -102,6 +102,9 @@ int32_t execute (const uint8_t* command)
 	pcblock.pid = new_pid;
 	switch(new_pid)
 	{
+		case 0:
+			pcblock.cr3 = (uint32_t)page_directory;
+			break;
 		case 1:
 			pcblock.cr3 = (uint32_t)task1_page_directory;
 			break;
