@@ -68,11 +68,11 @@ int32_t rtc_close(int32_t fd){
 *   SIDE EFFECTS: None
 */ 
 int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
-	printf("entering RTC_read... \n");
+
 	intr_flag = 0;
 	while(intr_flag == 0);
 	
-	printf("exitting RTC_read... \n");
+
 	return 0;
 }
 

@@ -294,6 +294,7 @@ int loader(const uint8_t* filename)
 				asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
+		pc = pc+1;
 		return eip;
 	}
 	else

@@ -23,7 +23,6 @@
 #define SDIN			0
 #define SDOUT			1
 #define MAX_FD			7
-
 //declaration of process control block.
 /*typedef struct __attribute__((packed)) pcb_t
 {

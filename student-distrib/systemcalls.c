@@ -24,38 +24,25 @@ uint32_t tasks[3] = {1,0,0}; //For the future, this will be 7
  */
 int32_t halt (uint8_t status)
 {
-
 	//try to halt from shell, restart shell
 	if(find_pid() == 1)
 	{
 		return 0;
 	}
+	pc = pc-1;
 	pcblock = *(pcblock.prev_pcb);
-	asm volatile ("movl %0, %%CR3":: "b"(pcblock.cr3));
-	tss.ss0 = KERNEL_DS;
-	tss.esp0 = pcblock.esp;	
-	asm volatile("              \n\
-		#cli 				\n\
-		movw  %0, %%ax      \n\
-		movw %%ax, %%ds		\n\
-		pushl %0			\n\
-		pushl %1			\n\
-		pushl $0x200         	\n\
-		pushl %2			\n\
-		pushl %3			\n\
-		movl %4, %%ebp		\n\
-		iret 				\n\
-		"
-		:
-		: "g"(KERNEL_DS), "g"(pcblock.esp), "g"(KERNEL_CS), "g"(pcblock.eip), "g"(pcblock.ebp)
-		: "eax"
-		);
+	asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
+	tss.esp0 = EIGHT_MB -4;	
+	asm volatile("movl %0, %%esp	;"
+				 "pushl %1			;"
+				 ::"g"(pcblock.esp),"g"(status));
+	asm volatile("movl %0, %%ebp"::"g"(pcblock.ebp));
+	
+	asm volatile("popl %eax");
+	asm volatile("leave");
+	asm volatile("ret");
 	return 0;
 	
-	//
-	uint8_t filename[] = "shell";
-	execute(filename);		
-	return 0;
 }
 
 /*
@@ -66,7 +53,9 @@ int32_t halt (uint8_t status)
  * RETURN: 0 on success
  */
 int32_t execute (const uint8_t* command)
-{	uint32_t eip = 0;
+{	
+	int pd_addr;
+	uint32_t eip = 0;
 	uint32_t new_pid = 7;
 	int i;
 	if(command == NULL)
@@ -86,19 +75,17 @@ int32_t execute (const uint8_t* command)
 			break;
 		}
 	}
-	if(new_pid == 7 || !new_pid)
-	{
-		write(1, "terrible terrible damage", 24); // All processes taken
-		return -1;
-	}	//enable terminal
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
+	printf("%d", pc);
 	//mark all other file struct as unoccupied 
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
 	//save paging
+	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
+	asm volatile("movl %0, %%cr3" : : "r" (pd_addr));
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
 	//put in page directory of new task
 	//asm volatile ("movl %0, %%CR3":: "i"())
@@ -111,10 +98,6 @@ int32_t execute (const uint8_t* command)
 	:
 	: "cc" );
 	//asm volatile("movl %0, %%esp" : : "r"(MB_132));
-	asm volatile("movl $halt_pos, %0" 
-	: "=a"(pcblock.eip)
-	:
-	: "cc" );
 	pcb_t new_pcb = pcblock;
 	new_pcb.prev_pcb = &pcblock;
 	pcblock = new_pcb;
@@ -131,9 +114,8 @@ int32_t execute (const uint8_t* command)
 			write(1, "You done goofed", 15); //Error level over 9000
 			return -1;
 	}
-	asm volatile("movl %0, %%CR3":: "r"(pcblock.cr3));
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = MB_132 - KB_8;
+	tss.esp0 = EIGHT_MB-KB_8*(pc-1) - 4;
 	//counter++;
 	asm volatile("              \n\
 		cli 				\n\
@@ -154,13 +136,6 @@ int32_t execute (const uint8_t* command)
 		: "g"(USER_DS), "g"(MB_132 - 4), "g"(USER_CS), "g"(eip)
 		: "eax", "memory"
 	);
-	asm volatile("halt_pos: 			"
-				 "ret					"
-			:
-			:
-			: "cc"
-			);
-	pc = pc-1;
 	return 0;
 }
 
@@ -332,5 +307,57 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 			return 2;
 		return -1;
  }
+/*
+ * getargs()
+ * get the argument of the command
+ * INPUT: buf, the input buffer to be copied, nbytes, length you want to copy
+ * OUTPUT: on succeed, return 0, else, return -1
+ * RETURN: copy the command to the buf. 
+ */
+int32_t getargs (uint8_t* buf, int32_t nbytes)
+{
+/*
+	uint32_t i;
+	if(buf == NULL || nbytes <0)
+	{
+		return -1;
+	}
+	for(i=0;i<BYTES_4K;i++)
+	{
+		buf[i]=NULL;
+	}
+	if(pcba.argd_size<nbytes)
+		memcpy(buf,pcblock.argd,pcblock.argd_size);
+	else
+		memcpy(buf,pcblock.argd,nbytes);
+	*/	
+	return 0;
+}
+/*
+ * vidmap()
+ * map the video memory into user space at a pre-set virtual address.
+ * INPUT: the virtual start of the screen
+ * OUTPUT: on succeed, return 0, else, return -1
+ * RETURN: hide the video memory
+ */
+int32_t vidmap(uint8_t** screen_start)
+{
+	if(screen_start==ZERO_MB || screen_start==(uint8_t**)FOUR_MB || screen_start == NULL)
+		return -1;
+	*screen_start = (uint8_t *)video_mem;
+	return 0;
+}
+
+int32_t set_handler (int32_t signum, void* handler)
+{
+	
+	return 0;
+}
+
+int32_t sigreturn (void)
+{
+	
+	return 0;
+}
 
 
