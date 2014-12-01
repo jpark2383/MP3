@@ -25,29 +25,11 @@
 #define MAX_FD			7
 #define CMD_LEN			40
 //declaration of process control block.
-/*typedef struct __attribute__((packed)) pcb_t
-{
-	uint32_t *prev_pcb;
-	uint32_t *espptr;
-	uint32_t esp;
-	uint32_t old_pc;
 
-	uint32_t eip;
-	uint32_t *ret_ebp;
-	uint32_t *ret_pd;
-	file_struct_t file_struct[8];
-	
-	dentry_t dentry[8];
-	uint32_t signal;
-	uint8_t cmd_name[40];
-	uint8_t arg_name[40];
-	uint8_t data_arg_size;
-} pcb_t;*/
 typedef struct __attribute__((packed)) pcb_t pcb_t;
 struct pcb_t
 {
 	pcb_t *prev_pcb;
-	//uint32_t *espptr;
 	uint32_t esp;
 	uint32_t eip;
 	uint32_t ebp;
@@ -56,7 +38,6 @@ struct pcb_t
 	file_struct_t file_struct[8];
 	
 	dentry_t dentry[8];
-	//uint32_t signal;
 	uint8_t cmd_name[CMD_LEN];
 	uint8_t arg_name[CMD_LEN];
 	uint8_t data_arg_size;
