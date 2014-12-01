@@ -26,14 +26,18 @@ uint32_t tasks[3] = {0,0,0}; //For the future, this will be 7
 int32_t halt (uint8_t status)
 {
 	//try to halt from shell, restart shell
-	if(find_pid() == 1)
+	if(pc == 1)
 	{
+		printf("Cant exit from last shell");
+		while(1);
 		return 0;
 	}
 	tasks[find_pid()] = 0;
 	pc = pc-1;
 	pcblock = *(pcblock.prev_pcb);
+	/*restore parents paging*/
 	asm volatile ("mov %0, %%CR3":: "r"(task1_page_directory));
+	/*restore paresnts TSS kernel stack*/
 	tss.esp0 = EIGHT_MB -4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
@@ -41,6 +45,7 @@ int32_t halt (uint8_t status)
 	asm volatile("movl %0, %%ebp"::"g"(pcblock.ebp));
 	
 	asm volatile("popl %eax");
+	/*return 0*/
 	asm volatile("movl $0, %eax");
 	asm volatile("leave");
 	asm volatile("ret");
@@ -157,6 +162,7 @@ int32_t execute (const uint8_t* command)
 	eip = loader(pcblock.cmd_name);
 	if(eip == -1)
 		return -1;
+	/*check to see which task it is*/
 	for(i = 0; i < 3; i++)
 	{
 		if(tasks[i] == 0)
@@ -174,12 +180,11 @@ int32_t execute (const uint8_t* command)
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
 	//save paging
+	/*flush the tlb*/
 	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
 	asm volatile("movl %0, %%cr3" : : "r" (pd_addr));
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
-	//put in page directory of new task
-	//asm volatile ("movl %0, %%CR3":: "i"())
-	//get the esp
+	//save the esp
 	asm volatile("movl %%esp, %0"
      :"=r"(pcblock.esp)
      );
@@ -187,11 +192,11 @@ int32_t execute (const uint8_t* command)
 	: "=a"(pcblock.ebp)
 	:
 	: "cc" );
-	//asm volatile("movl %0, %%esp" : : "r"(MB_132));
 	pcb_t new_pcb = pcblock;
 	new_pcb.prev_pcb = &pcblock;
 	pcblock = new_pcb;
 	pcblock.pid = new_pid;
+	/*check to see which program is running*/
 	switch(new_pid)
 	{
 		case 0:
@@ -207,9 +212,11 @@ int32_t execute (const uint8_t* command)
 			write(1, "You done goofed", 15); //Error level over 9000
 			return -1;
 	}
+	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = EIGHT_MB-KB_8*(pc-1) - 4;
 	//counter++;
+	/* inline assembly code to push the required variables to perform privilege switch*/
 	asm volatile("              \n\
 		cli 				\n\
 		movw  %0, %%ax      \n\
