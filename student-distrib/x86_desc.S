@@ -11,8 +11,8 @@
 .globl  tss, tss_desc_ptr, ldt, ldt_desc_ptr
 .globl  gdt_ptr, gdt_desc_ptr
 .globl  idt_desc_ptr, idt
-.globl  page_directory, page_table, task1_page_directory, page_table1, page_table2, task2_page_directory
-
+.globl  page_table, page_table1, page_table2, page_table1, page_table2, page_table3, page_table4, page_table5, page_table6, terminal_page_directory, terminal_page_table
+.globl	page_directory, task1_page_directory, task2_page_directory, task3_page_directory, task4_page_directory, task5_page_directory, task6_page_directory, terminal_page_directory
 .align 4
 
 
@@ -110,14 +110,6 @@ _idt:
 
 idt_bottom:
 
-.align 4096
-page_directory:
-_page_directory:
-	.rept NUM_ENTRIES_PD
-	.long 0
-	.endr
-
-
 	# Set up of the Page Table from 0 to 4MB
 page_table:
 _page_table:
@@ -130,6 +122,49 @@ _page_table1:
 	.rept NUM_ENTRIES_PT
 	.long 0
 	.endr	
+	
+page_table2:
+_page_table2:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr
+
+page_table3:
+_page_table3:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr
+
+page_table4:
+_page_table4:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr	
+
+page_table5:
+_page_table5:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr
+	
+page_table6:
+_page_table6:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr
+	
+terminal_page_table:
+_terminal_page_table:
+	.rept NUM_ENTRIES_PT
+	.long 0
+	.endr
+
+.align 4096
+page_directory:
+_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
 
 .align 4096
 task1_page_directory:
@@ -138,11 +173,6 @@ _task1_page_directory:
 	.long 0
 	.endr
 	
-page_table2:
-_page_table2:
-	.rept NUM_ENTRIES_PT
-	.long 0
-	.endr	
 
 .align 4096
 task2_page_directory:
@@ -151,3 +181,37 @@ _task2_page_directory:
 	.long 0
 	.endr
 
+.align 4096
+task3_page_directory:
+_task3_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task4_page_directory:
+_task4_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task5_page_directory:
+_task5_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+	
+.align 4096
+task6_page_directory:
+_task6_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+
+.align 4096
+terminal_page_directory:
+_terminal_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr

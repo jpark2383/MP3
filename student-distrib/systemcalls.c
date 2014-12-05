@@ -13,7 +13,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[3] = {0,0,0}; //For the future, this will be 7
+uint32_t tasks[7] = {0,0,0,0,0,0,0}; //For the future, this will be 7
 
 
 /*
@@ -207,6 +207,18 @@ int32_t execute (const uint8_t* command)
 			break;
 		case 2:
 			pcblock.cr3 = (uint32_t)task2_page_directory;
+			break;
+		case 3:
+			pcblock.cr3 = (uint32_t)task3_page_directory;
+			break;
+		case 4:
+			pcblock.cr3 = (uint32_t)task4_page_directory;
+			break;
+		case 5:
+			pcblock.cr3 = (uint32_t)task5_page_directory;
+			break;
+		case 6:
+			pcblock.cr3 = (uint32_t)task6_page_directory;
 			break;
 		default:
 			//write(1, "You done goofed", 15); //Error level over 9000
@@ -412,6 +424,14 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 			return 1;
 		if(cr3==(uint32_t)task2_page_directory)
 			return 2;
+		if(cr3==(uint32_t)task3_page_directory)
+			return 3;
+		if(cr3==(uint32_t)task4_page_directory)
+			return 4;
+		if(cr3==(uint32_t)task5_page_directory)
+			return 5;
+		if(cr3==(uint32_t)task6_page_directory)
+			return 6;
 		return -1;
  }
 /*
