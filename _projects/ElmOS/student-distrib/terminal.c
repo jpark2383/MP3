@@ -116,6 +116,22 @@ void keyboard_read(unsigned char keystroke)
 		else if((x < counter) && (x == 79))
 			set_cursor(0, y + 1);
 	}*/
+
+	/*Psuedo code for terminal switch */
+	/*else if (keystroke == T1_SWITCH || keystroke == T2_SWITCH || keystroke == T3_SWITCH)
+	{
+		if(keystroke == T1_SWITCH)
+			terminal_switch(1);
+			break;
+		if(keystroke == T2_SWITCH)
+			terminal_switch(2);
+			break;
+		if(keystroke == T3_SWITCH)
+			terminal_switch(3);
+			break;
+	}
+	*/
+	
 	else if (keystroke == CTRL_C)
 	{
 		send_eoi(PIC_8);

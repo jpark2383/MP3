@@ -104,6 +104,21 @@ unsigned char read_keyboard()
 				caps_flag = 1;
 			charval = NULL;
 		}
+		
+		/* Pseudo code for 
+		else if(alt_flag == 1 && (code >= 'F1' || code <= 'F3'))
+		{
+			if(code == 'F1')
+				charval = T1_SWITCH;
+				break;
+			else if(code == 'F2')
+				charval = T2_SWITCH;
+				break;
+			else if(code == 'F3')
+				charval = T3_SWITCH
+				break;
+		}*/
+
 		else if((code >= '\'') && (code <= 'z')) // If it is a character
 		{
 			if(ctrl_flag == 1) // control is pressed
