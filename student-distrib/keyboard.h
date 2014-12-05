@@ -54,7 +54,9 @@
 #define RIGHT_SHIFT_R		0xB6
 #define CTRL_RELEASE		0x9D
 #define ALT_RELEASE			0xBA
-
+#define T1_SWITCH			0x9000
+#define T2_SWITCH			0x9001
+#define T3_SWITCH			0x9002
 #define KB_DATA 			0x60
 #define KEYBOARD_CMD_PORT   0x64
 #define KEY_PRESS		0x80
