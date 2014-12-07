@@ -58,7 +58,7 @@ int32_t set_handler (int32_t signum, void* handler_address);
 int32_t sigreturn (void);
 void parse_cmd(const uint8_t * input);
 void pcb_clear();
-int find_pid();
+extern int find_pid();
 
 #endif
 

@@ -2,11 +2,14 @@
 #include "lib.h"
 #include "x86_desc.h"
 #include "rtc.h"
+#include "systemcalls.h"
 
 //declare arrays and variabls for text, history, counter, newline detector
 unsigned char text_buf[BUF_MAX];
 unsigned int counter;
 int entered = 0;
+int cur_terminal = 1;
+pcb_t term_pcb;
 //int newline = 0;
 
 /*
@@ -48,6 +51,7 @@ int32_t terminal_open(const uint8_t *filename)
 	counter = 0; //initialize things
 	set_cursor(0,0);
 	enable_irq(PIC_1);
+	switcher_init();
 	return 0;
 }
 
@@ -118,19 +122,22 @@ void keyboard_read(unsigned char keystroke)
 	}*/
 
 	/*Psuedo code for terminal switch */
-	/*else if (keystroke == T1_SWITCH || keystroke == T2_SWITCH || keystroke == T3_SWITCH)
+	else if (keystroke >= T1_SWITCH && keystroke <= T3_SWITCH)
 	{
-		if(keystroke == T1_SWITCH)
-			terminal_switch(1);
-			break;
-		if(keystroke == T2_SWITCH)
-			terminal_switch(2);
-			break;
-		if(keystroke == T3_SWITCH)
-			terminal_switch(3);
-			break;
+		switch(keystroke)
+		{
+			case T1_SWITCH:
+				terminal_switch(1);
+				break;
+			case T2_SWITCH:
+				terminal_switch(2);
+				break;
+			case T3_SWITCH:
+				terminal_switch(3);
+				break;
+		}
 	}
-	*/
+	
 	
 	else if (keystroke == CTRL_C)
 	{
@@ -359,4 +366,136 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t len)
 {
 	if (fd == 1) return -1;
 	return read_helper((uint8_t*)buf, len);
+}
+
+void switcher_init()
+{	
+	memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	/*
+	int32_t freq = 32;
+	
+	rtc_init();
+	rtc_write (0,&freq, 4);*/
+}
+
+
+
+/*
+ * terminal_switch
+ * This function is used to aid in switching terminals.  This function will copy data 
+ * from video memory to three separate buffers located at 6MB
+ * INPUT: t_num: This is the terminal that we will be switching to
+ * OUTPUT: NONE
+ * RETURN: display_terminal number
+ */
+
+int32_t terminal_switch(int32_t t_num)
+{
+	if(cur_terminal == t_num)
+		return 0;
+	int cterm = cur_terminal - 1; //for ease of use
+	int i; //counter
+	//get esp and cr3 and save into the current terminal struct
+	asm volatile("movl %%esp, %0;" 
+	:"=r"(terminals[cterm].esp)
+	);
+	asm volatile("movl %%CR3, %0;"
+	:"=r"(terminals[cterm].cr3)
+	);
+	//save the old file information back in 
+	int pid = get_pid_from_cr3(terminals[cterm].cr3);
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
+	memcpy(&term_pcb, pcbptr, pcb_size);
+	//terminals[cterm].pcblock = term_pcb;
+	
+	for(i = 0; i < STRUCTS; i++)
+		terminals[cterm].file_struct[i] = term_pcb.file_struct[i];
+	
+	
+	
+	terminals[cterm].pos_x = getx();
+	terminals[cterm].pos_y = gety();
+	
+	// Saves the current line buffer
+	for(i = 0; i < BUF_MAX; i++)
+		terminals[cterm].t_linebuffer[i] = text_buf[i];
+	
+	// Copies current video memory to buffer
+	if(cur_terminal == T1_NUM)
+		memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	else if (cur_terminal == T2_NUM)
+		memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	else if (cur_terminal == T3_NUM)
+		memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+		
+	cur_terminal = t_num;
+	cterm = cur_terminal - 1;
+	clear();
+	
+	// Copies memory from buffer to the video memory
+	if(t_num == T1_NUM)
+		memcpy((uint32_t*)V_MEM_ADDR,(uint32_t*)TERM1,MEM_4KB);
+	else if (t_num == T2_NUM)
+		memcpy((uint32_t*)V_MEM_ADDR,(uint32_t*)TERM2,MEM_4KB);
+	else if (t_num == T3_NUM)
+		memcpy((uint32_t*)V_MEM_ADDR,(uint32_t*)TERM3,MEM_4KB);
+	
+	// Sets appropriate x and y positions
+	setx(terminals[cterm].pos_x);
+	sety(terminals[cterm].pos_y);
+	
+	
+	
+	// Sets old line buffers data
+	for(i = 0; i < BUF_MAX; i++)
+		text_buf[i] = terminals[cterm].t_linebuffer[i];
+				
+	send_eoi(PIC_1);
+	
+	
+	
+	
+	pid = get_pid_from_cr3(terminals[cterm].cr3);
+	pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
+	memcpy(&term_pcb, pcbptr, pcb_size);
+	
+	//put the old file information back in pcb
+	for(i = 0; i < STRUCTS; i++)
+		term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
+	//term_pcb = terminals[cterm].pcblock;	
+	memcpy(&pcblock, &term_pcb, pcb_size);
+
+	/*if(!scheduling_enable)
+	{*/	
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = terminals[cterm].esp;
+	asm volatile("mov %0, %%CR3":: "b"(terminals[cterm].cr3)
+	);
+	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
+	);
+	/*}*/
+
+	return 0;
+}
+
+int get_pid_from_cr3(uint32_t cr3)
+{
+		if(cr3==(uint32_t)page_directory)
+			return 0;
+		if(cr3==(uint32_t)task1_page_directory)
+			return 1;
+		if(cr3==(uint32_t)task2_page_directory)
+			return 2;
+		if(cr3==(uint32_t)task3_page_directory)
+			return 3;
+		if(cr3==(uint32_t)task4_page_directory)
+			return 4;
+		if(cr3==(uint32_t)task5_page_directory)
+			return 5;
+		if(cr3==(uint32_t)task6_page_directory)
+			return 6;
+		return -1;
+		return -1;
 }

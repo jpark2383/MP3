@@ -13,7 +13,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[7] = {0,0,0,0,0,0,0}; //For the future, this will be 7
+uint32_t tasks[6] = {0,0,0,0,0,0}; //For the future, this will be 6
 
 
 /*
@@ -297,8 +297,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  */
  int32_t open (const uint8_t* filename)
  {
-	int pid = 0;
-	pid = find_pid();
+	int pid = find_pid();
 
 	int index_temp;
 	fd_index = FD_MIN;
