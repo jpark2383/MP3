@@ -5,7 +5,7 @@
 #include "types.h"
 #include "lib.h"
 
-#define pcb_size		753
+#define pcb_size		745
 #define MB_132			0x08400000
 #define KB_8			0x2000
 #define EIGHT_MB		0x800000
@@ -25,7 +25,7 @@
 #define MAX_FD			7
 #define CMD_LEN			40
 //declaration of process control block.
-
+//745
 typedef struct __attribute__((packed)) pcb_t pcb_t;
 struct pcb_t
 {
@@ -35,12 +35,12 @@ struct pcb_t
 	uint32_t ebp;
 	uint32_t cr3;
 	uint32_t pid;
-	file_struct_t file_struct[8];
+	file_struct_t file_struct[8]; //128
 	
-	dentry_t dentry[8];
-	uint8_t cmd_name[CMD_LEN];
-	uint8_t arg_name[CMD_LEN];
-	uint8_t data_arg_size;
+	dentry_t dentry[8]; // 512
+	uint8_t cmd_name[CMD_LEN]; // 40
+	uint8_t arg_name[CMD_LEN]; // 40
+	uint8_t data_arg_size; // 1
 };
 
 pcb_t pcblock;

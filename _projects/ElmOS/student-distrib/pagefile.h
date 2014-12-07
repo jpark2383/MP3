@@ -1,4 +1,3 @@
-
 #include "types.h"
 #include "lib.h"
 #include "x86_desc.h"
@@ -17,6 +16,11 @@
 #define VIDEO_MEM_PAGE_U 0x000B8007
 #define MB_8_MAP 0x00800087
 #define MB_12_MAP 0x00C00087
+#define MB_16_MAP 0x01000087
+#define MB_20_MAP 0x01400087
+#define MB_24_MAP 0x01800087
+#define MB_28_MAP 0x01C00087
+#define MB_32_MAP 0x02000087
 
 #define CR4_PSE 0x00000010
 #define ENABLE_PAGING 0x80000000
