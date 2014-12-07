@@ -373,6 +373,10 @@ void switcher_init()
 	memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
+	terminals[T1_NUM].cr3 = (uint32_t)task1_page_directory;
+	terminals[T2_NUM].cr3 = (uint32_t)task2_page_directory;
+	terminals[T3_NUM].cr3 = (uint32_t)task3_page_directory;
+
 	/*
 	int32_t freq = 32;
 	

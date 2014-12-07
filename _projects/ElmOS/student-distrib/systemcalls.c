@@ -163,7 +163,7 @@ int32_t execute (const uint8_t* command)
 	if(eip == -1)
 		return -1;
 	/*check to see which task it is*/
-	for(i = 0; i < 3; i++)
+	for(i = 0; i < 7; i++)
 	{
 		if(tasks[i] == 0)
 		{
