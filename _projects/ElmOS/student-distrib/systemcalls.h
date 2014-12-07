@@ -5,7 +5,7 @@
 #include "types.h"
 #include "lib.h"
 
-#define pcb_size		745
+#define pcb_size		745 // old value was 753.
 #define MB_132			0x08400000
 #define KB_8			0x2000
 #define EIGHT_MB		0x800000

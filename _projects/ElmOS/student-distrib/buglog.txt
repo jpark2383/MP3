@@ -1,0 +1,49 @@
+----------------------------------------------------------------------------------------
+CP1:
+----------------------------------------------------------------------------------------
+
+No bugs
+
+----------------------------------------------------------------------------------------
+CP2:
+----------------------------------------------------------------------------------------
+
+	- GDT info not cleared from screen while testing keyboard. FIXED: Clearing the screen at startup.
+	
+	- Right shift key would caps lock after being pressed once. FIXED: Changed value of Right Shift key
+	
+	- When text buffer was filled up, backspaced would clear characters off screen and not the buffer.
+	FIXED: Keyboard interrupt handler would write more characters than the buffer would handle which was more
+	characters than the conditions allowed, which caused nothing to happen to the buffer when backspacing.
+	Changed a number to not allow too many characters to be written to the buffer.
+	
+	- Scrolling not working. Each character would be on a new line. FIXED: Changed boundary conditions and buffer for scrolling.
+	
+	- Read directory was just printing out the directory. FIXED: Write the directory to the buffer and not to the screen.
+
+----------------------------------------------------------------------------------------
+CP3:
+----------------------------------------------------------------------------------------
+	- Jump table was not in standard jump table form. FIXED: Changed the jump table to standard jump table form.
+	
+	- Halt produced page faults. FIXED: Saved and loaded critical variables into pcb.
+	
+----------------------------------------------------------------------------------------
+CP4:
+----------------------------------------------------------------------------------------
+
+	- Counter not working. FIXED: Wrote to correct buffer.
+	
+	- ls not working. FIXED: Wrote to the buffer instead of printing to the screen
+	
+	- Command not read properly. FIXED: Changed boundary condition to not always be true.
+	
+----------------------------------------------------------------------------------------
+CP5:
+----------------------------------------------------------------------------------------
+
+	- Switching terminals page faults.
+	
+	- Exiting from multiple shells page faults.
+	
+	- 
