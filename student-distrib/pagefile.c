@@ -32,7 +32,6 @@ void paging_init()
 	for(i = 1; i < NUM_ENTRIES_PT; i++)  //initialize entries
 	{
 		page_table[i] = EMPTY;
-		
 	}
 	
 	//kernel
