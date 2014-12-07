@@ -22,6 +22,11 @@ void paging_init()
 	{
 		page_directory[i] = EMPTY;
 		task1_page_directory[i]= EMPTY;
+		task2_page_directory[i]= EMPTY;
+		task3_page_directory[i]= EMPTY;
+		task4_page_directory[i]= EMPTY;
+		task5_page_directory[i]= EMPTY;
+		task6_page_directory[i]= EMPTY;
 	}
 	
 	for(i = 1; i < NUM_ENTRIES_PT; i++)  //initialize entries
@@ -45,6 +50,32 @@ void paging_init()
 	task2_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
 	task2_page_directory[1] = KERNEL_PTR;
 	task2_page_directory[32]= MB_12_MAP;
+	//program 3
+	page_table3[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	task3_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	task3_page_directory[1] = KERNEL_PTR;
+	task3_page_directory[32]= MB_16_MAP;
+	//program 4
+	page_table4[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	task4_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	task4_page_directory[1] = KERNEL_PTR;
+	task4_page_directory[32]= MB_20_MAP;
+	//program 5
+	page_table5[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	task5_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	task5_page_directory[1] = KERNEL_PTR;
+	task5_page_directory[32]= MB_24_MAP;
+	//program 6
+	page_table6[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	task6_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	task6_page_directory[1] = KERNEL_PTR;
+	task6_page_directory[32]= MB_28_MAP;
+
+	//terminals
+	terminal_page_table[VIDEO_MEM_LOCATION] = VIDEO_MEM_PAGE_U; //Set the video memory location in the address space
+	terminal_page_directory[0] = (uint32_t) page_table2 | USER_SUPERVISOR | PRESENT | MASK_RW ;
+	terminal_page_directory[1] = KERNEL_PTR;
+	terminal_page_directory[32]= MB_32_MAP;
 	
 	//The below code fetches the register values , sets them appropriately and writes them back
 	asm volatile ("mov %0, %%CR3":: "b"(page_directory));

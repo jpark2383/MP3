@@ -497,5 +497,4 @@ int get_pid_from_cr3(uint32_t cr3)
 		if(cr3==(uint32_t)task6_page_directory)
 			return 6;
 		return -1;
-		return -1;
 }
