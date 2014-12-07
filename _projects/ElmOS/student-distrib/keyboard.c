@@ -105,19 +105,23 @@ unsigned char read_keyboard()
 			charval = NULL;
 		}
 		
-		/* Pseudo code for 
-		else if(alt_flag == 1 && (code >= 'F1' || code <= 'F3'))
+		// Pseudo code for terminal switching
+		else if(alt_flag == 1 && (code >= F1 && code <= F3))
 		{
-			if(code == 'F1')
-				charval = T1_SWITCH;
-				break;
-			else if(code == 'F2')
-				charval = T2_SWITCH;
-				break;
-			else if(code == 'F3')
-				charval = T3_SWITCH
-				break;
-		}*/
+			switch(code)
+			{
+				case F1:
+					charval = T1_SWITCH;
+					break;
+				case F2:
+					charval = T2_SWITCH;
+					break;
+				case F3:
+					charval = T3_SWITCH;
+					break;
+				default: break;
+			}
+		}
 
 		else if((code >= '\'') && (code <= 'z')) // If it is a character
 		{
@@ -130,9 +134,6 @@ unsigned char read_keyboard()
 					case 'l': 
 						charval = CTRL_L; //Special CTRL_L value
 						break;
-					/*case '1': charval = CTRL_1; //first terminal
-					case '2': charval = CTRL_2; //second terminal
-					case '3': charval = CTRL_3; //thrid terminal*/
 					default: break;
 				}
 			}

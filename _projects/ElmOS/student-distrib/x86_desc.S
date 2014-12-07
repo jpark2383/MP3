@@ -11,8 +11,9 @@
 .globl  tss, tss_desc_ptr, ldt, ldt_desc_ptr
 .globl  gdt_ptr, gdt_desc_ptr
 .globl  idt_desc_ptr, idt
-.globl  page_table, page_table1, page_table2, page_table1, page_table2, page_table3, page_table4, page_table5, page_table6, terminal_page_directory, terminal_page_table
-.globl	page_directory, task1_page_directory, task2_page_directory, task3_page_directory, task4_page_directory, task5_page_directory, task6_page_directory, terminal_page_directory
+.globl  page_directory, page_table, page_table1, page_table2, page_table1, page_table2, page_table3, page_table4, page_table5, page_table6, terminal_page_directory
+.globl	task1_page_directory, task2_page_directory, task3_page_directory, task4_page_directory, task5_page_directory, task6_page_directory
+.globl  terminal_page_table, terminal_page_directory
 .align 4
 
 
@@ -110,6 +111,14 @@ _idt:
 
 idt_bottom:
 
+.align 4096
+page_directory:
+_page_directory:
+	.rept NUM_ENTRIES_PD
+	.long 0
+	.endr
+
+	
 	# Set up of the Page Table from 0 to 4MB
 page_table:
 _page_table:
@@ -159,12 +168,6 @@ _terminal_page_table:
 	.long 0
 	.endr
 
-.align 4096
-page_directory:
-_page_directory:
-	.rept NUM_ENTRIES_PD
-	.long 0
-	.endr
 
 .align 4096
 task1_page_directory:
