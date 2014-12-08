@@ -26,7 +26,7 @@ uint32_t tasks[7] = {1,0,0,0,0,0,0}; //For the future, this will be 6
 int32_t halt (uint8_t status)
 {
 	//try to halt from shell, restart shell
-	if(pc == 1)
+	if(find_pid() == 1)
 	{
 		printf("Cant exit from last shell");
 		//while(1);
