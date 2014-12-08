@@ -411,7 +411,7 @@ int32_t terminal_switch(int32_t t_num)
 	//save the old file information back in 
 	int pid = get_pid_from_cr3(terminals[cterm].cr3);
 	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
-	memcpy(&term_pcb, pcbptr, pcb_size);
+	memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	//terminals[cterm].pcblock = term_pcb;
 	
 	for(i = 0; i < STRUCTS; i++)
@@ -463,13 +463,13 @@ int32_t terminal_switch(int32_t t_num)
 	
 	pid = get_pid_from_cr3(terminals[cterm].cr3);
 	pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
-	memcpy(&term_pcb, pcbptr, pcb_size);
+	memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	
 	//put the old file information back in pcb
 	for(i = 0; i < STRUCTS; i++)
 		term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
 	//term_pcb = terminals[cterm].pcblock;	
-	memcpy(&pcblock, &term_pcb, pcb_size);
+	memcpy(&pcblock, &term_pcb, PCB_SIZE);
 
 	/*if(!scheduling_enable)
 	{*/	

@@ -13,7 +13,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[6] = {0,0,0,0,0,0}; //For the future, this will be 6
+uint32_t tasks[7] = {1,0,0,0,0,0,0}; //For the future, this will be 6
 
 
 /*
@@ -29,14 +29,15 @@ int32_t halt (uint8_t status)
 	if(pc == 1)
 	{
 		printf("Cant exit from last shell");
-		while(1);
+		//while(1);
 		return 0;
 	}
 	tasks[find_pid()] = 0;
 	pc = pc-1;
-	pcblock = *(pcblock.prev_pcb);
+	pcblock = *((pcb_t*)pcblock.prev_pcb);
+	printf("pc: %d\n", pc);
 	/*restore parents paging*/
-	asm volatile ("mov %0, %%CR3":: "r"(task1_page_directory));
+	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
 	/*restore paresnts TSS kernel stack*/
 	tss.esp0 = EIGHT_MB -4;	
 	asm volatile("movl %0, %%esp	;"
@@ -152,18 +153,12 @@ void parse_cmd(const uint8_t * input)
  */
 int32_t execute (const uint8_t* command)
 {	
+	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
 	int pd_addr;
 	uint32_t eip = 0;
 	uint32_t new_pid = 7;
 	int i;
-	if(command == NULL)
-		return -1;
-	parse_cmd(command);
-	eip = loader(pcblock.cmd_name);
-	if(eip == -1)
-		return -1;
-	/*check to see which task it is*/
-	for(i = 0; i < 7; i++)
+	for(i = 1; i < 7; i++)
 	{
 		if(tasks[i] == 0)
 		{
@@ -172,6 +167,21 @@ int32_t execute (const uint8_t* command)
 			break;
 		}
 	}
+	if(command == NULL)
+		return -1;
+	if(new_pid == 7)
+	{
+		write(1, "6 programs already open.\n", 25);
+		return -1;
+	}
+
+
+	parse_cmd(command);
+	eip = loader(pcblock.cmd_name);
+	if(eip == -1)
+		return -1;
+	/*check to see which task it is*/
+
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
@@ -183,7 +193,7 @@ int32_t execute (const uint8_t* command)
 	/*flush the tlb*/
 	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
 	asm volatile("movl %0, %%cr3" : : "r" (pd_addr));
-	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
+
 	//save the esp
 	asm volatile("movl %%esp, %0"
      :"=r"(pcblock.esp)
@@ -192,9 +202,9 @@ int32_t execute (const uint8_t* command)
 	: "=a"(pcblock.ebp)
 	:
 	: "cc" );
-	pcb_t new_pcb = pcblock;
-	new_pcb.prev_pcb = &pcblock;
-	pcblock = new_pcb;
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()) -START);
+	memcpy(pcbptr, &pcblock, PCB_SIZE);
+	pcblock.prev_pcb = (uint32_t)pcbptr;
 	pcblock.pid = new_pid;
 	/*check to see which program is running*/
 	switch(new_pid)
@@ -332,7 +342,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	if(filesystem_open(filename) == -1)
 	{
 		pcblock.file_struct[fd_index].flags = 0;
-		memcpy(pcb_ptr, &pcblock, pcb_size);
+		memcpy(pcb_ptr, &pcblock, PCB_SIZE);
 		return -1;
 	}
 
@@ -343,14 +353,14 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		rtc_open(filename);
 		pcblock.file_struct[fd_index].flags = 1;
 		pcblock.file_struct[fd_rtc].fops_ptr = &rtc_fops;
-		memcpy(pcb_ptr, &pcblock, pcb_size);
+		memcpy(pcb_ptr, &pcblock, PCB_SIZE);
 		return fd_index;
 	}
 	else
 	{
 		pcblock.file_struct[fd_index].fpos = 0;
 		pcblock.file_struct[fd_index].fops_ptr = &filesystem_fops;
-		memcpy(pcb_ptr, &pcblock, pcb_size);
+		memcpy(pcb_ptr, &pcblock, PCB_SIZE);
 		return fd_index;
 	}
  } 
@@ -419,17 +429,17 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		asm volatile ("movl %%CR3, %0": "=b"(cr3));
 		if(cr3==(uint32_t)page_directory)
 			return 0;
-		if(cr3==(uint32_t)task1_page_directory)
+		else if(cr3==(uint32_t)task1_page_directory)
 			return 1;
-		if(cr3==(uint32_t)task2_page_directory)
+		else if(cr3==(uint32_t)task2_page_directory)
 			return 2;
-		if(cr3==(uint32_t)task3_page_directory)
+		else if(cr3==(uint32_t)task3_page_directory)
 			return 3;
-		if(cr3==(uint32_t)task4_page_directory)
+		else if(cr3==(uint32_t)task4_page_directory)
 			return 4;
-		if(cr3==(uint32_t)task5_page_directory)
+		else if(cr3==(uint32_t)task5_page_directory)
 			return 5;
-		if(cr3==(uint32_t)task6_page_directory)
+		else if(cr3==(uint32_t)task6_page_directory)
 			return 6;
 		return -1;
  }

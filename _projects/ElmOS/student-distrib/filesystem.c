@@ -327,10 +327,10 @@ int loader(const uint8_t* filename)
 				asm volatile ("mov %0, %%CR3":: "b"(task5_page_directory));
 			else if (pc ==5)
 				asm volatile ("mov %0, %%CR3":: "b"(task6_page_directory));
-
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		pc = pc+1;
+		printf("pc: %d\n", pc);
 		return eip;
 	}
 	else
