@@ -26,19 +26,23 @@ uint32_t tasks[7] = {1,0,0,0,0,0,0}; //For the future, this will be 6
 int32_t halt (uint8_t status)
 {
 	//try to halt from shell, restart shell
-	if(find_pid() == 1)
+	if(pc == 1)
 	{
-		printf("Cant exit from last shell");
-		//while(1);
+		int z;
+		for(z = 0; z < 6; z++)
+			tasks[z] = 0;
+		pc--;
+		execute((uint8_t*)"shell");		
+		
 		return 0;
 	}
 	tasks[find_pid()] = 0;
 	pc = pc-1;
 	pcblock = *((pcb_t*)pcblock.prev_pcb);
 	printf("pc: %d\n", pc);
-	/*restore parents paging*/
+	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
-	/*restore paresnts TSS kernel stack*/
+	// restore parents TSS kernel stack
 	tss.esp0 = EIGHT_MB -4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
@@ -46,7 +50,7 @@ int32_t halt (uint8_t status)
 	asm volatile("movl %0, %%ebp"::"g"(pcblock.ebp));
 	
 	asm volatile("popl %eax");
-	/*return 0*/
+	//
 	asm volatile("movl $0, %eax");
 	asm volatile("leave");
 	asm volatile("ret");
@@ -112,7 +116,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
-		//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
+
 	}
 	//in the event that the first character is not a space
 	else
@@ -140,8 +144,7 @@ void parse_cmd(const uint8_t * input)
 		}
 		//load the size of the arg into the pcb
 		pcblock.data_arg_size = arg_size;
-		//printf("\nargd_size is set to %d\nThe command was set as %s\nThe argument was %s\n",pcblock.data_arg_size,pcblock.cmd_name,pcblock.arg_name);
-	}
+		}
 }
 
 /*
@@ -153,12 +156,12 @@ void parse_cmd(const uint8_t * input)
  */
 int32_t execute (const uint8_t* command)
 {	
-	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
+	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));		// save CR3 into PCB
 	int pd_addr;
 	uint32_t eip = 0;
 	uint32_t new_pid = 7;
-	int i;
-	for(i = 1; i < 7; i++)
+	int i = 1;
+	for(i = 1; i < 7; i++)		// find which process it is from 1 - 6
 	{
 		if(tasks[i] == 0)
 		{
@@ -167,28 +170,31 @@ int32_t execute (const uint8_t* command)
 			break;
 		}
 	}
+	
+	// check if command is valid
 	if(command == NULL)
 		return -1;
+		
+	// check if we are running more than 6 programs
 	if(new_pid == 7)
 	{
 		write(1, "6 programs already open.\n", 25);
 		return -1;
 	}
 
-
 	parse_cmd(command);
 	eip = loader(pcblock.cmd_name);
 	if(eip == -1)
 		return -1;
-	/*check to see which task it is*/
-
+		
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
 	pcblock.file_struct[SDOUT].fops_ptr = &terminal_fops;
-	//mark all other file struct as unoccupied 
+	// mark all other file struct as unoccupied 
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
+		
 	//save paging
 	/*flush the tlb*/
 	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
@@ -202,15 +208,19 @@ int32_t execute (const uint8_t* command)
 	: "=a"(pcblock.ebp)
 	:
 	: "cc" );
-	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()) -START);
-	memcpy(pcbptr, &pcblock, PCB_SIZE);
-	pcblock.prev_pcb = (uint32_t)pcbptr;
+	
+	// if it is the first process, don't do anything
+	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
+	if(new_pid != 1){
+		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()-1) - START);
+		memcpy(pcbptr, &pcblock, PCB_SIZE);
+		pcblock.prev_pcb = (uint32_t)pcbptr;
+	}
 	pcblock.pid = new_pid;
-	/*check to see which program is running*/
 	switch(new_pid)
 	{
 		case 0:
-			pcblock.cr3 = (uint32_t)page_directory;
+			printf("I don't think you should ever be here");
 			break;
 		case 1:
 			pcblock.cr3 = (uint32_t)task1_page_directory;
@@ -231,12 +241,14 @@ int32_t execute (const uint8_t* command)
 			pcblock.cr3 = (uint32_t)task6_page_directory;
 			break;
 		default:
-			//write(1, "You done goofed", 15); //Error level over 9000
 			return -1;
+		
 	}
+	
 	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = EIGHT_MB-KB_8*(pc-1) - 4;
+	
 	//counter++;
 	/* inline assembly code to push the required variables to perform privilege switch*/
 	asm volatile("              \n\
