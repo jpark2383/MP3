@@ -5,7 +5,7 @@
 #include "types.h"
 #include "lib.h"
 
-#define pcb_size		745 // old value was 753.
+#define PCB_SIZE		745
 #define MB_132			0x08400000
 #define KB_8			0x2000
 #define EIGHT_MB		0x800000
@@ -29,7 +29,7 @@
 typedef struct __attribute__((packed)) pcb_t pcb_t;
 struct pcb_t
 {
-	pcb_t *prev_pcb;
+	uint32_t prev_pcb;
 	uint32_t esp;
 	uint32_t eip;
 	uint32_t ebp;
