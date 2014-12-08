@@ -13,8 +13,9 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[7] = {1,0,0,0,0,0,0}; //For the future, this will be 6
-
+uint32_t tasks[7] = {1,0,0,0,0,0,0}; 
+int term2_flag = 0;
+int term3_flag = 0;
 
 /*
  * int32_t halt (uint8_t status)
@@ -26,10 +27,10 @@ uint32_t tasks[7] = {1,0,0,0,0,0,0}; //For the future, this will be 6
 int32_t halt (uint8_t status)
 {
 	//try to halt from shell, restart shell
-	if(pc == 1)
+	if(pc <= 3)
 	{
 		int z;
-		for(z = 0; z < 6; z++)
+		for(z = 2; z < 6; z++)
 			tasks[z] = 0;
 		pc--;
 		execute((uint8_t*)"shell");		
@@ -39,7 +40,7 @@ int32_t halt (uint8_t status)
 	tasks[find_pid()] = 0;
 	pc = pc-1;
 	pcblock = *((pcb_t*)pcblock.prev_pcb);
-	printf("pc: %d\n", pc);
+	//printf("pc: %d\n", pc);
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
 	// restore parents TSS kernel stack
@@ -156,11 +157,22 @@ void parse_cmd(const uint8_t * input)
  */
 int32_t execute (const uint8_t* command)
 {	
+	// check if command is valid
+	if(command == NULL)
+		return -1;
+	if(strncmp(command, "shell", 5) == 0)
+	{
+		if(term2_flag == 0)
+		{
+
+		}
+	}
+
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));		// save CR3 into PCB
 	int pd_addr;
 	uint32_t eip = 0;
 	uint32_t new_pid = 7;
-	int i = 1;
+	int i;
 	for(i = 1; i < 7; i++)		// find which process it is from 1 - 6
 	{
 		if(tasks[i] == 0)
@@ -171,10 +183,6 @@ int32_t execute (const uint8_t* command)
 		}
 	}
 	
-	// check if command is valid
-	if(command == NULL)
-		return -1;
-		
 	// check if we are running more than 6 programs
 	if(new_pid == 7)
 	{

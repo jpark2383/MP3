@@ -9,6 +9,8 @@ unsigned char text_buf[BUF_MAX];
 unsigned int counter;
 int entered = 0;
 int cur_terminal = 1;
+int term2_flag = 0;
+int term3_flag = 0;
 pcb_t term_pcb;
 //int newline = 0;
 
@@ -51,7 +53,8 @@ int32_t terminal_open(const uint8_t *filename)
 	counter = 0; //initialize things
 	set_cursor(0,0);
 	enable_irq(PIC_1);
-	switcher_init();
+	//multi_init();
+	//multi_init();
 	return 0;
 }
 
@@ -368,15 +371,19 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t len)
 	return read_helper((uint8_t*)buf, len);
 }
 
-void switcher_init()
+/* multi_init
+ * This function saves the video memory of each terminal
+ * one at a time.
+ * INPUT: none
+ * OUTPUT: none
+ * SIDE EFFECTS: videomemory is put into memory
+ */
+
+void multi_init()
 {	
 	memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
-	terminals[T1_NUM].cr3 = (uint32_t)task1_page_directory;
-	terminals[T2_NUM].cr3 = (uint32_t)task2_page_directory;
-	terminals[T3_NUM].cr3 = (uint32_t)task3_page_directory;
-
 	/*
 	int32_t freq = 32;
 	
@@ -384,7 +391,32 @@ void switcher_init()
 	rtc_write (0,&freq, 4);*/
 }
 
+/* multi_init
+ * This function opens a shell and initializes either terminal 2 or terminal 3.
+ * INPUT: terminal number
+ * OUTPUT: none
+ * SIDE EFFECTS: A shell is executed in a terminal
+ */
 
+void start_terminal(int32_t t_num)
+{
+	if(t_num == 2)
+	{
+		int cterm = cur_terminal - 1; //for ease of use
+		int i; //counter
+		//get esp and cr3 and save into the current terminal struct
+		asm volatile("movl %%esp, %0;" 
+		:"=r"(terminals[cterm].esp)
+		);
+		asm volatile("movl %%CR3, %0;"
+		:"=r"(terminals[cterm].cr3)
+		);
+		//save the old file information back in 
+		int pid = get_pid_from_cr3(terminals[cterm].cr3);
+
+	}
+		execute((uint8_t*)"shell");
+}
 
 /*
  * terminal_switch
@@ -399,6 +431,7 @@ int32_t terminal_switch(int32_t t_num)
 {
 	if(cur_terminal == t_num)
 		return 0;
+
 	int cterm = cur_terminal - 1; //for ease of use
 	int i; //counter
 	//get esp and cr3 and save into the current terminal struct
@@ -434,6 +467,18 @@ int32_t terminal_switch(int32_t t_num)
 	else if (cur_terminal == T3_NUM)
 		memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 		
+	if(t_num == 2 && term2_flag == 0)
+	{
+		term2_flag = 1;
+		execute((uint8_t*)"shell");
+		exit();
+	}
+	if(t_num == 3 && term3_flag == 0)
+	{
+		term3_flag = 1;
+		execute((uint8_t*)"shell");
+		exit();
+	}
 	cur_terminal = t_num;
 	cterm = cur_terminal - 1;
 	clear();
@@ -479,8 +524,9 @@ int32_t terminal_switch(int32_t t_num)
 	);
 	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
 	);
-	/*}*/
 
+	
+	/*}*/
 	return 0;
 }
 

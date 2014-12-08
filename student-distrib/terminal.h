@@ -39,6 +39,7 @@ typedef struct terminal_t
 	int pos_x;
 	int pos_y;
 	uint32_t esp;
+	uint32_t ebp;
 	uint32_t cr3;
 	file_struct_t file_struct[8];
 } terminal_t;
@@ -52,7 +53,8 @@ extern int32_t terminal_open(const uint8_t* filename); //Opens the terminal
 extern int32_t terminal_close(int32_t fd); //Closes the terminal
 extern int32_t terminal_read(int32_t fd, void* buf, int32_t len); //Read from the terminal
 extern int32_t terminal_write(int32_t fd, const void* buf, int32_t len); //Write to the terminal
-extern void switcher_init(); //Initializer for the switcher
+extern void multi_init(); // initialize the three terminals
+extern void start_terminal(int32_t t_num);
 extern int32_t terminal_switch(int32_t terminal_num);//Switch terminals
 
 int32_t read_helper(uint8_t *buf, int32_t length); //Slave to the read function
