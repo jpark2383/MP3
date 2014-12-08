@@ -229,8 +229,13 @@ entry (unsigned long magic, unsigned long addr)
 	
 	/* Execute the first program (`shell') ... */
 
-	uint8_t filename[] = "shell";	
-	execute(filename);
+	 uint8_t filename[] = "shell";	
+	 execute(filename);
+	 execute(filename);
+	 execute(filename);
+	 execute(filename);
+	 execute(filename);
+	 
 
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
