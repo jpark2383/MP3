@@ -239,22 +239,6 @@ int32_t dirclose(int32_t fd)
  
 int32_t dirread(int32_t fd, void* buf)
 {
-	/*if (pcblock.file_struct[fd].fpos >= filesystem.num_dir_entries)
-		return 0;
-	
-	uint32_t temp;
-	uint8_t * currptr;
-	
-	currptr = filesystem.dentry_begin + pcblock.file_struct[fd].fpos*(B_64);
-	temp = *(currptr + B_32);
-	if(temp){
-		memcpy(buf,currptr,strlen(currptr));
-	}
-		
-	pcblock.file_struct[fd].fpos++;
-	
-	return strlen(currptr);	*/
-	
 	uint32_t temp = 0;
 	int8_t* currptr;
 		
@@ -315,6 +299,10 @@ int loader(const uint8_t* filename)
 		read_data(dentry1.inode_number, 0, data_buf, data_length);
 		/*get the eip*/
 		eip = data_buf[S_27] << B_24 | data_buf[S_26] << B_16 | data_buf[S_25] << B_8  | data_buf[24];
+		printf("in loader pc = %d\n", pc);
+		
+		// think of pc as # of programs running at the moment..
+		// if pc = 0, there are no programs running, so should use task1_pd
 			if (pc ==0)
 				asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
 			else if (pc ==1)
@@ -330,7 +318,6 @@ int loader(const uint8_t* filename)
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		pc = pc+1;
-		printf("pc: %d\n", pc);
 		return eip;
 	}
 	else
