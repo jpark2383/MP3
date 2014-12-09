@@ -47,16 +47,16 @@ CP5:
 
 	12/6/14 - Switching terminals page faults.FIXED:
 	
-	12/6/14- Exiting from multiple shells page faults. FIXED:
+	12/6/14- Exiting from multiple shells page faults. FIXED:corrected accidental PID change.
 	
-	12/6/14 - Exiting a shell after opening shells in multiple terminals page faults.
+	12/6/14 - Exiting a shell after opening shells in multiple terminals page faults.12/9/14 FIXED: corrected accidental PID change
 
-	12/6/14 - Switching terminals rapidly page faults.
+	12/6/14 - Switching terminals rapidly page faults. 12/9/14 FIXED: Fixed after fixing above 2 bugs
 
-	12/8/14 - Running fish, pingpong, and counter in each terminal causes page faults.
+	12/8/14 - Running fish, pingpong, and counter in each terminal causes page faults. 12/9/14 FIXED: Properly restored parent paging and pcb.
 
-	12/8/14 - Running pingpong -> switching terminals -> switching back, freezes pingpong.
+	12/8/14 - Running pingpong -> switching terminals -> switching back, freezes pingpong.12/9/14 FIXED: Properly restored parent paging and pcb.
 
-	12/8/14 - Having six running programs and switching terminals page faults.
+	12/8/14 - Having six running programs and switching terminals page faults.12/9/14 FIXED: Properly restored parent paging and pcb.
 
-	12/8/14 - After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT. FIXED: value for alt released was wrong.
+	12/8/14 - After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT.12/8/14 FIXED: value for alt released was wrong.
