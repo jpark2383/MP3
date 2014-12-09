@@ -26,6 +26,7 @@
 #define S_27 27
 #define S_26 26
 #define S_25 25
+#define S_24 24
 #define MAGIC_NUM_1  0x7f
 #define MAGIC_NUM_2  0x45
 #define MAGIC_NUM_3  0x4c

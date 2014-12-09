@@ -21,7 +21,7 @@
 #define MB_24_MAP 0x01800087
 #define MB_28_MAP 0x01C00087
 #define MB_32_MAP 0x02000087
-
+#define P_32 32
 #define CR4_PSE 0x00000010
 #define ENABLE_PAGING 0x80000000
 #define EMPTY 0

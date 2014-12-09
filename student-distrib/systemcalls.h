@@ -24,8 +24,17 @@
 #define SDOUT			1
 #define MAX_FD			7
 #define CMD_LEN			40
+#define MAX_TASKS		7
+#define T_SHELL_MAX		3
+#define BUFF_MAX		1024
+#define T_1				1
+#define T_2				2
+#define T_3				3
+#define FILE_MAX		8
+#define FILE_MIN		2
+#define T_6				6
+
 //declaration of process control block.
-//745
 typedef struct __attribute__((packed)) pcb_t pcb_t;
 struct pcb_t
 {
@@ -35,18 +44,19 @@ struct pcb_t
 	uint32_t ebp;
 	uint32_t cr3;
 	uint32_t parent_pid;
-	file_struct_t file_struct[8]; //128
+	file_struct_t file_struct[8];
 	
-	dentry_t dentry[8]; // 512
-	uint8_t cmd_name[CMD_LEN]; // 40
-	uint8_t arg_name[CMD_LEN]; // 40
-	uint8_t data_arg_size; // 1
+	dentry_t dentry[8]; 
+	uint8_t cmd_name[CMD_LEN];
+	uint8_t arg_name[CMD_LEN];
+	uint8_t data_arg_size;
 };
 
 pcb_t pcblock;
 int fd_index;
 uint32_t new_pid;
 
+/* function declaratios */
 int32_t halt(uint8_t status);
 int32_t execute(const uint8_t* command);
 int32_t read(int32_t fd, void* buf, int32_t nbytes);

@@ -55,8 +55,6 @@ int32_t terminal_open(const uint8_t *filename)
 	term2_press = 0;
 	term3_press = 0;
 	enable_irq(PIC_1);
-	//multi_init();
-	//multi_init();
 	return 0;
 }
 
@@ -91,43 +89,14 @@ void keyboard_read(unsigned char keystroke)
 	int y = gety();
 	set_cursor(x,y);
 	uint8_t buf[BUF_MIN];
-	//unsigned char keystroke = read_keyboard();
+
 	//Condition: backspace
 	if(keystroke == '\t')
 	{
 		printf("    ");
 		set_cursor(x+4, y);
 	}
-	/* For another time
-	else if(keystroke == UP)
-	{
-		if(counter < 80)
-			set_cursor(0, y);
-		else
-			set_cursor(0, y - 1);
-	}
-	else if(keystroke == DOWN)
-	{
-		if(counter < 80)
-			set_cursor(counter, y);
-		else
-			set_cursor(counter - 80, y + 1);
-	}
-	else if(keystroke == LEFT)
-	{
-		set_cursor(x - 1, y);
-	}
-	else if(keystroke == RIGHT)
-	{
-		if((x < counter) && (x < 79))
-			set_cursor(x + 1, y);
-		else if((x < counter) && (x == 79))
-			set_cursor(0, y + 1);
-	}*/
 
-	/*Psuedo code for terminal switch */
-
-	
 	else if (keystroke == CTRL_C)
 	{
 		send_eoi(PIC_8);
@@ -238,23 +207,12 @@ void keyboard_read(unsigned char keystroke)
 
 int32_t read_helper(uint8_t *buf, int32_t length)
 {
-	//printf("read_helper called \n");
-	//if((fd == 1) || (buf == NULL) || (length < 0))
-	//	return -1;
 	while(1)
 	{
-		//printf("got to line 205\n");
-		/*if(newline == 1)
-		{*/
-			//printf("got to line 208\n");
 		if(entered == 1)
 		{
 			int i = 0;
 			int ret_val;
-			//clear the buffer
-			/*this might screw us up later*/
-			//for(i = 0; i < length; i++)
-				//buf[i] = NULL;
 			//set new buffer values
 			for(i = 0; (i < length) && (i < BUF_MAX); i++)
 			{
@@ -284,7 +242,6 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 
  int32_t write_helper(const uint8_t* text, int32_t length)
  {
- 	//printf("write_helper called \n");
  	cli();
  	int i, j, k;
  	int x = getx();
@@ -391,33 +348,6 @@ void multi_init()
 	rtc_write (0,&freq, 4);*/
 }
 
-/* multi_init
- * This function opens a shell and initializes either terminal 2 or terminal 3.
- * INPUT: terminal number
- * OUTPUT: none
- * SIDE EFFECTS: A shell is executed in a terminal
- */
-
-/*void start_terminal(int32_t t_num)
-{
-	if(t_num == 2)
-	{
-		int cterm = cur_terminal - 1; //for ease of use
-		int i; //counter
-		//get esp and cr3 and save into the current terminal struct
-		asm volatile("movl %%esp, %0;" 
-		:"=r"(terminals[cterm].esp)
-		);
-		asm volatile("movl %%CR3, %0;"
-		:"=r"(terminals[cterm].cr3)
-		);
-		//save the old file information back in 
-		int pid = get_pid_from_cr3(terminals[cterm].cr3);
-
-	}
-		execute((uint8_t*)"shell");
-}*/
-
 /*
  * terminal_switch
  * This function is used to aid in switching terminals.  This function will copy data 
@@ -443,7 +373,7 @@ int32_t terminal_switch(int32_t t_num)
 	terminals[cterm].kernel_esp = tss.esp0;
 	//save the old file information back in 
 	int pid = get_pid_from_cr3(terminals[cterm].cr3);
-	uint32_t *pcbptr_1 = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
+	uint32_t *pcbptr_1 = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START - S_6*STACK_EIGHTKB);
 	memcpy(&term_pcb, pcbptr_1, PCB_SIZE);
 	//terminals[cterm].pcblock = term_pcb;
 	
@@ -518,7 +448,7 @@ int32_t terminal_switch(int32_t t_num)
 	
 	
 	pid = get_pid_from_cr3(terminals[cterm].cr3);
-	pcbptr_1 = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
+	pcbptr_1 = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START - S_6*STACK_EIGHTKB);
 	memcpy(&term_pcb, pcbptr_1, PCB_SIZE);
 	
 	//put the old file information back in pcb
@@ -526,7 +456,7 @@ int32_t terminal_switch(int32_t t_num)
 		term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
 	memcpy(&pcblock, &term_pcb, PCB_SIZE);
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = EIGHT_MB-KB_8*(pid-1) - 4;
+	tss.esp0 = EIGHT_MB-KB_8*(pid-1) - S_4;
 	asm volatile("mov %0, %%CR3":: "b"(terminals[cterm].cr3)
 	);
 	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
