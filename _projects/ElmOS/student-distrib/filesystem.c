@@ -296,8 +296,8 @@ int loader(const uint8_t* filename)
 	/*executable*/
 	if(buf[0] == MAGIC_NUM_1 && buf[B_1] == MAGIC_NUM_2 && buf[B_2] ==MAGIC_NUM_3 && buf[B_3] == MAGIC_NUM_4)
 	{
-		uint8_t data_buf[data_length];
-		read_data(dentry1.inode_number, 0, data_buf, data_length);
+		uint8_t * data_buf = (uint8_t *)NEW_LOAD;
+		read_data(dentry1.inode_number, 0, (uint8_t*)data_buf, data_length);
 		/*get the eip*/
 		eip = data_buf[S_27] << B_24 | data_buf[S_26] << B_16 | data_buf[S_25] << B_8  | data_buf[24];
 		//printf("in loader pc = %d\n", pc);
