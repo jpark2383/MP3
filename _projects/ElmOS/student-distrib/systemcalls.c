@@ -38,16 +38,22 @@ int32_t halt (uint8_t status)
 	}
 	tasks[find_pid()] = 0;
 	pc = pc-1;
-	pcblock = *((pcb_t*)pcblock.prev_pcb);
+	pcb_t halt_pcb;
+	int pid_h;
+	uint32_t *pcb_h = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()) -START -6*STACK_EIGHTKB);
+	memcpy(&halt_pcb, pcb_h, PCB_SIZE);
+	pid_h = halt_pcb.pid;
+	pcb_h = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid_h) -START -6*STACK_EIGHTKB);
+	memcpy(&halt_pcb, pcb_h, PCB_SIZE);
 	//printf("pc: %d\n", pc);
 	// restore parents paging
-	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
+	asm volatile ("mov %0, %%CR3":: "r"(halt_pcb.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB - KB_8*(find_pid()) - 4;	
+	tss.esp0 = EIGHT_MB - KB_8*(halt_pcb.pid) - 4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
-				 ::"g"(pcblock.esp),"g"(status));
-	asm volatile("movl %0, %%ebp"::"g"(pcblock.ebp));
+				 ::"g"(halt_pcb.esp),"g"(status));
+	asm volatile("movl %0, %%ebp"::"g"(halt_pcb.ebp));
 	
 	asm volatile("popl %eax");
 	//
@@ -227,12 +233,13 @@ int32_t execute (const uint8_t* command)
 	
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
+	pcblock.pid = new_pid;
 	if(new_pid != 1){
 		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(new_pid) - START -6*STACK_EIGHTKB);
 		memcpy(pcbptr, &pcblock, PCB_SIZE);
 		pcblock.prev_pcb = (uint32_t)pcbptr;
 	}
-	pcblock.pid = new_pid;
+	
 	switch(new_pid)
 	{
 		case 0:
