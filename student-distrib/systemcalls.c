@@ -228,7 +228,7 @@ int32_t execute (const uint8_t* command)
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
 	if(new_pid != 1){
-		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(cur_pid) - START);
+		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(cur_pid) - START -6*STACK_EIGHTKB);
 		memcpy(pcbptr, &pcblock, PCB_SIZE);
 		pcblock.prev_pcb = (uint32_t)pcbptr;
 	}
@@ -263,7 +263,7 @@ int32_t execute (const uint8_t* command)
 	
 	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = EIGHT_MB-KB_8*(new_pid) - 4;
+	tss.esp0 = EIGHT_MB-KB_8*(new_pid-1) - 4;
 	
 	//counter++;
 	/* inline assembly code to push the required variables to perform privilege switch*/
