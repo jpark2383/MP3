@@ -34,7 +34,7 @@ struct pcb_t
 	uint32_t eip;
 	uint32_t ebp;
 	uint32_t cr3;
-	uint32_t pid;
+	uint32_t parent_pid;
 	file_struct_t file_struct[8]; //128
 	
 	dentry_t dentry[8]; // 512
@@ -45,6 +45,7 @@ struct pcb_t
 
 pcb_t pcblock;
 int fd_index;
+uint32_t new_pid;
 
 int32_t halt(uint8_t status);
 int32_t execute(const uint8_t* command);
