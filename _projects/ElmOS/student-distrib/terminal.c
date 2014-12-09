@@ -9,8 +9,8 @@ unsigned char text_buf[BUF_MAX];
 unsigned int counter;
 int entered = 0;
 int cur_terminal = 1;
-int term2_flag = 0;
-int term3_flag = 0;
+static int term2_flag = 0;
+static int term3_flag = 0;
 pcb_t term_pcb;
 //int newline = 0;
 
@@ -52,6 +52,8 @@ int32_t terminal_open(const uint8_t *filename)
 	}
 	counter = 0; //initialize things
 	set_cursor(0,0);
+	term2_press = 0;
+	term3_press = 0;
 	enable_irq(PIC_1);
 	//multi_init();
 	//multi_init();
@@ -133,9 +135,11 @@ void keyboard_read(unsigned char keystroke)
 				terminal_switch(1);
 				break;
 			case T2_SWITCH:
+				term2_press = 1;
 				terminal_switch(2);
 				break;
 			case T3_SWITCH:
+				term3_press = 1;
 				terminal_switch(3);
 				break;
 		}
@@ -398,7 +402,7 @@ void multi_init()
  * SIDE EFFECTS: A shell is executed in a terminal
  */
 
-void start_terminal(int32_t t_num)
+/*void start_terminal(int32_t t_num)
 {
 	if(t_num == 2)
 	{
@@ -416,7 +420,7 @@ void start_terminal(int32_t t_num)
 
 	}
 		execute((uint8_t*)"shell");
-}
+}*/
 
 /*
  * terminal_switch
@@ -471,13 +475,13 @@ int32_t terminal_switch(int32_t t_num)
 	{
 		term2_flag = 1;
 		execute((uint8_t*)"shell");
-		exit();
+		return 0;
 	}
 	if(t_num == 3 && term3_flag == 0)
 	{
 		term3_flag = 1;
 		execute((uint8_t*)"shell");
-		exit();
+		return 0;
 	}
 	cur_terminal = t_num;
 	cterm = cur_terminal - 1;

@@ -27,11 +27,10 @@ int term3_flag = 0;
 int32_t halt (uint8_t status)
 {
 	//try to halt from shell, restart shell
-	if(pc <= 3)
+	if(find_pid() <= 3)
 	{
 		int z;
-		for(z = 2; z < 6; z++)
-			tasks[z] = 0;
+		tasks[find_pid()] = 0;
 		pc--;
 		execute((uint8_t*)"shell");		
 		
@@ -160,21 +159,17 @@ int32_t execute (const uint8_t* command)
 	// check if command is valid
 	if(command == NULL)
 		return -1;
-	if(strncmp(command, "shell", 5) == 0)
-	{
-		if(term2_flag == 0)
-		{
-
-		}
-	}
 
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));		// save CR3 into PCB
 	int pd_addr;
 	uint32_t eip = 0;
 	uint32_t new_pid = 7;
 	int i;
+	int cur_pid = find_pid();
 	for(i = 1; i < 7; i++)		// find which process it is from 1 - 6
 	{
+		if(i == 2)
+			i = 4;
 		if(tasks[i] == 0)
 		{
 			new_pid = i;
@@ -182,7 +177,22 @@ int32_t execute (const uint8_t* command)
 			break;
 		}
 	}
-	
+	if(pc == 0)
+	{
+		new_pid = 1;
+	}
+	//Check if we are opening terminals
+	else if(!strncmp((int8_t*)command, "shell", 5) && term2_press)
+	{
+		new_pid = 2;
+		term2_press = 0;
+	}
+	else if(!strncmp((int8_t*)command, "shell", 5) && term3_press)
+	{
+		new_pid = 3;
+		term3_press = 0;
+	}
+
 	// check if we are running more than 6 programs
 	if(new_pid == 7)
 	{
@@ -220,7 +230,7 @@ int32_t execute (const uint8_t* command)
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
 	if(new_pid != 1){
-		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()-1) - START);
+		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(cur_pid) - START);
 		memcpy(pcbptr, &pcblock, PCB_SIZE);
 		pcblock.prev_pcb = (uint32_t)pcbptr;
 	}

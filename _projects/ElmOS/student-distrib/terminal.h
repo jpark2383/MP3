@@ -45,7 +45,8 @@ typedef struct terminal_t
 } terminal_t;
 
 terminal_t terminals[3];
-
+int32_t term2_press;
+int32_t term3_press;
 
 extern void set_cursor(int x, int y); //Sets the cursor
 extern void keyboard_read(unsigned char keystroke); //Parses whatever comes form the keyboard
@@ -54,7 +55,7 @@ extern int32_t terminal_close(int32_t fd); //Closes the terminal
 extern int32_t terminal_read(int32_t fd, void* buf, int32_t len); //Read from the terminal
 extern int32_t terminal_write(int32_t fd, const void* buf, int32_t len); //Write to the terminal
 extern void multi_init(); // initialize the three terminals
-extern void start_terminal(int32_t t_num);
+//extern void start_terminal(int32_t t_num);
 extern int32_t terminal_switch(int32_t terminal_num);//Switch terminals
 
 int32_t read_helper(uint8_t *buf, int32_t length); //Slave to the read function
