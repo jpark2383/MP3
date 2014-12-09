@@ -18,15 +18,17 @@ void pit_intr_handler(void)
 {
 	cli();
 	send_eoi(PIT_IRQ);
-	pcb_t pcb_cur;
-	pcb_t pcb_next;
+	pcb_t* pcb_cur;
+	pcb_t* pcb_next;
 	uint32_t pid = find_pid();
+	
 	/*if there is only one program running*/
 	if(pid == 1)
 	{
 		return;
 	}
 	int pid_next = (pid+1)%8;
+	//pcb_cur = (pcb_t*)(EIGHT_MB - KB_8*pid);
 	pcb_cur = (pcb_t*)(EIGHT_MB - KB_8*pid);
 	
 	/*save the esp ebp cr3 in pcb*/
@@ -46,19 +48,19 @@ void pit_intr_handler(void)
 			process_mask |= 0x1 >> pid_next;
 			break;
 		}
-	pid_next = (pid_next + 1) %8;
+		pid_next = (pid_next + 1) %8;
 	}
 	/*load the next process's pcb*/
-	asm volatile("movl %%cr3, %0" : "=r" (pcb_cur.cr3));
-	asm volatile("movl %%esp, %0" : "=r" (pcb_cur.esp));
-	asm volatile("movl %%ebp, %0" : "=r" (pcb_cur.ebp));
+	asm volatile("movl %%cr3, %0" : "=r" (pcb_cur->cr3));
+	asm volatile("movl %%esp, %0" : "=r" (pcb_cur->esp));
+	asm volatile("movl %%ebp, %0" : "=r" (pcb_cur->ebp));
 	
 	pcb_next = (pcb_t *)(EIGHT_MB - KB_8*pid_next);
 	tss.ss0=KERNEL_DS;
 	tss.esp0 = EIGHT_MB - KB_8*(pid_next-1) - 4;
-	asm volatile ("mov %0, %%CR3":: "r"(pcb_next.cr3));
-	asm volatile ("mov %0, %%esp":: "r"(pcb_next.esp));
-	asm volatile ("mov %0, %%ebp":: "r"(pcb_next.ebp));
+	asm volatile ("mov %0, %%CR3":: "r"(pcb_next->cr3));
+	asm volatile ("mov %0, %%esp":: "r"(pcb_next->esp));
+	asm volatile ("mov %0, %%ebp":: "r"(pcb_next->ebp));
 	asm volatile("leave");
 	asm volatile("ret");
 }
