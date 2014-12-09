@@ -53,3 +53,5 @@ CP5:
 	- Running fish, pingpong, and counter in each terminal causes page faults.
 
 	- Running pingpong -> switching terminals -> switching back, freezes pingpong.
+
+	- Having six running programs and switching terminals page faults.
