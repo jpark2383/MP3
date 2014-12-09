@@ -42,8 +42,10 @@ CP4:
 CP5:
 ----------------------------------------------------------------------------------------
 
-	- Switching terminals page faults.
+	- Switching terminals page faults.FIXED:
 	
-	- Exiting from multiple shells page faults.
+	- Exiting from multiple shells page faults. FIXED:
 	
-	- 
+	- Exiting a shell after opening shells in multiple terminals page faults.
+
+	- Switching terminals rapidly page faults.
