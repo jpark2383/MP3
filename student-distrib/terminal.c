@@ -55,8 +55,6 @@ int32_t terminal_open(const uint8_t *filename)
 	term2_press = 0;
 	term3_press = 0;
 	enable_irq(PIC_1);
-	//multi_init();
-	//multi_init();
 	return 0;
 }
 
@@ -98,33 +96,6 @@ void keyboard_read(unsigned char keystroke)
 		printf("    ");
 		set_cursor(x+4, y);
 	}
-	/* For another time
-	else if(keystroke == UP)
-	{
-		if(counter < 80)
-			set_cursor(0, y);
-		else
-			set_cursor(0, y - 1);
-	}
-	else if(keystroke == DOWN)
-	{
-		if(counter < 80)
-			set_cursor(counter, y);
-		else
-			set_cursor(counter - 80, y + 1);
-	}
-	else if(keystroke == LEFT)
-	{
-		set_cursor(x - 1, y);
-	}
-	else if(keystroke == RIGHT)
-	{
-		if((x < counter) && (x < 79))
-			set_cursor(x + 1, y);
-		else if((x < counter) && (x == 79))
-			set_cursor(0, y + 1);
-	}*/
-
 	/*Psuedo code for terminal switch */
 
 	
@@ -390,33 +361,6 @@ void multi_init()
 	rtc_init();
 	rtc_write (0,&freq, 4);*/
 }
-
-/* multi_init
- * This function opens a shell and initializes either terminal 2 or terminal 3.
- * INPUT: terminal number
- * OUTPUT: none
- * SIDE EFFECTS: A shell is executed in a terminal
- */
-
-/*void start_terminal(int32_t t_num)
-{
-	if(t_num == 2)
-	{
-		int cterm = cur_terminal - 1; //for ease of use
-		int i; //counter
-		//get esp and cr3 and save into the current terminal struct
-		asm volatile("movl %%esp, %0;" 
-		:"=r"(terminals[cterm].esp)
-		);
-		asm volatile("movl %%CR3, %0;"
-		:"=r"(terminals[cterm].cr3)
-		);
-		//save the old file information back in 
-		int pid = get_pid_from_cr3(terminals[cterm].cr3);
-
-	}
-		execute((uint8_t*)"shell");
-}*/
 
 /*
  * terminal_switch
