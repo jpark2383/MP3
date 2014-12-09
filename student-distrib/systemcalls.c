@@ -43,7 +43,7 @@ int32_t halt (uint8_t status)
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB - KB_8*(find_pid()-1) - 4;	
+	tss.esp0 = EIGHT_MB - KB_8*(find_pid()) - 4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
 				 ::"g"(pcblock.esp),"g"(status));
@@ -263,7 +263,7 @@ int32_t execute (const uint8_t* command)
 	
 	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = EIGHT_MB-KB_8*(cur_pid) - 4;
+	tss.esp0 = EIGHT_MB-KB_8*(new_pid) - 4;
 	
 	//counter++;
 	/* inline assembly code to push the required variables to perform privilege switch*/
