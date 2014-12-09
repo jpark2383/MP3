@@ -218,7 +218,8 @@ int32_t execute (const uint8_t* command)
 		write(1, "6 programs already open.\n", 25);
 		return -1;
 	}
-	if(cur_pid == 0) cur_pid++;
+	if(cur_pid == 0) 
+	cur_pid++;
 	tasks[new_pid] = cur_pid;
 	//save the esp and ebp
 	asm volatile("movl %%esp, %0"
