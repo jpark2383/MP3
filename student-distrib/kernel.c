@@ -173,7 +173,7 @@ entry (unsigned long magic, unsigned long addr)
 	init_fs();
 	enable_irq(PIC_1);
 	terminal_open(0);
-	pit_init();
+	//pit_init();
 	clear();
 
 	/* Enable interrupts */
