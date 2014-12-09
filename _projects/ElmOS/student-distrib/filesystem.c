@@ -304,25 +304,25 @@ int loader(const uint8_t* filename)
 		
 		// think of pc as # of programs running at the moment..
 		// if pc = 0, there are no programs running, so should use task1_pd
-			if (new_pid == 1){
+			if (new_pid == PID1){
 				asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
 				pc++;
 			}
-			else if (new_pid == 2){
+			else if (new_pid == PID2){
 				asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
 			}
-			else if (new_pid == 3){
+			else if (new_pid == PID3){
 				asm volatile ("mov %0, %%CR3":: "b"(task3_page_directory));
 			}
-			else if (new_pid == 4){
+			else if (new_pid == PID4){
 				asm volatile ("mov %0, %%CR3":: "b"(task4_page_directory));
 				pc++;
 			}
-			else if (new_pid == 5){
+			else if (new_pid == PID5){
 				asm volatile ("mov %0, %%CR3":: "b"(task5_page_directory));
 				pc++;
 			}
-			else if (new_pid == 6){
+			else if (new_pid == PID6){
 				asm volatile ("mov %0, %%CR3":: "b"(task6_page_directory));
 				pc++;
 			}

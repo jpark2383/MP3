@@ -173,7 +173,6 @@ entry (unsigned long magic, unsigned long addr)
 	init_fs();
 	enable_irq(PIC_1);
 	terminal_open(0);
-	//pit_init();
 	clear();
 
 	/* Enable interrupts */
@@ -233,10 +232,10 @@ entry (unsigned long magic, unsigned long addr)
 
 	 uint8_t filename[] = "shell";	
 	 execute(filename);
+	 /*execute(filename);
 	 execute(filename);
 	 execute(filename);
-	 execute(filename);
-	 execute(filename);
+	 execute(filename);*/
 	 
 
 	/* Spin (nicely, so we don't chew up cycles) */

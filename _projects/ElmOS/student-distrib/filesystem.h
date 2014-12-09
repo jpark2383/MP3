@@ -5,6 +5,12 @@
 #include "lib.h"
 #include "pagefile.h"
 
+#define PID1	1
+#define PID2	2
+#define PID3	3
+#define PID4	4
+#define PID5	5
+#define PID6	6
 
 #define BYTES_4 1
 #define BYTES_8 2

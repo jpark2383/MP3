@@ -36,6 +36,7 @@
 
 typedef struct terminal_t
 {
+	//These are things to be saved
 	unsigned char t_linebuffer[BUF_MAX];
 	int pos_x;
 	int pos_y;
@@ -48,7 +49,7 @@ typedef struct terminal_t
 } terminal_t;
 
 terminal_t terminals[3];
-int32_t term2_press;
+int32_t term2_press; //These are to determine whether to launch a new terminal
 int32_t term3_press;
 
 extern void set_cursor(int x, int y); //Sets the cursor

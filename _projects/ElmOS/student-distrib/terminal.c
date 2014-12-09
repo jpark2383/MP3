@@ -401,7 +401,7 @@ int32_t terminal_switch(int32_t t_num)
 	set_cursor(0,0);
 	cur_terminal = t_num;
 	cterm = cur_terminal - 1;
-	if(t_num == 2 && term2_flag == 0)
+	if(t_num == T2_NUM && term2_flag == 0)
 	{
 		for(i = 0; i < BUF_MAX; i++)
 			text_buf[i] = NULL;
@@ -412,7 +412,7 @@ int32_t terminal_switch(int32_t t_num)
 		execute((uint8_t*)"shell");
 		return 0;
 	}
-	if(t_num == 3 && term3_flag == 0)
+	if(t_num == T3_NUM && term3_flag == 0)
 	{
 		for(i = 0; i < BUF_MAX; i++)
 			text_buf[i] = NULL;
@@ -469,16 +469,16 @@ int get_pid_from_cr3(uint32_t cr3)
 		if(cr3==(uint32_t)page_directory)
 			return 0;
 		if(cr3==(uint32_t)task1_page_directory)
-			return 1;
+			return PID1;
 		if(cr3==(uint32_t)task2_page_directory)
-			return 2;
+			return PID2;
 		if(cr3==(uint32_t)task3_page_directory)
-			return 3;
+			return PID3;
 		if(cr3==(uint32_t)task4_page_directory)
-			return 4;
+			return PID4;
 		if(cr3==(uint32_t)task5_page_directory)
-			return 5;
+			return PID5;
 		if(cr3==(uint32_t)task6_page_directory)
-			return 6;
+			return PID6;
 		return -1;
 }
