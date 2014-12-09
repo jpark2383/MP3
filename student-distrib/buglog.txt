@@ -49,3 +49,7 @@ CP5:
 	- Exiting a shell after opening shells in multiple terminals page faults.
 
 	- Switching terminals rapidly page faults.
+
+	- Running fish, pingpong, and counter in each terminal causes page faults.
+
+	- Running pingpong -> switching terminals -> switching back, freezes pingpong.
