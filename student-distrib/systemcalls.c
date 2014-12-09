@@ -43,7 +43,7 @@ int32_t halt (uint8_t status)
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB -4;	
+	tss.esp0 = EIGHT_MB - KB_8*(pc-1) - 4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
 				 ::"g"(pcblock.esp),"g"(status));
