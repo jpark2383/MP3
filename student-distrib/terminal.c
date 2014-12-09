@@ -86,7 +86,6 @@ int32_t terminal_close(int32_t fd)
 void keyboard_read(unsigned char keystroke)
 {
 	//printf("keyboard_read called \n");
-	cli();
 	int i, j;			//declare variables for counters
 	int x = getx();
 	int y = gety();
@@ -127,24 +126,7 @@ void keyboard_read(unsigned char keystroke)
 	}*/
 
 	/*Psuedo code for terminal switch */
-	else if (keystroke >= T1_SWITCH && keystroke <= T3_SWITCH)
-	{
-		switch(keystroke)
-		{
-			case T1_SWITCH:
-				terminal_switch(1);
-				break;
-			case T2_SWITCH:
-				term2_press = 1;
-				terminal_switch(2);
-				break;
-			case T3_SWITCH:
-				term3_press = 1;
-				terminal_switch(3);
-				break;
-		}
-	}
-	
+
 	
 	else if (keystroke == CTRL_C)
 	{
@@ -202,13 +184,11 @@ void keyboard_read(unsigned char keystroke)
 		if(!strncmp((int8_t*)buf, (int8_t*)"391OS> ", BUF_MIN) && (x == BUF_MIN))
 		{
 			send_eoi(PIC_1);
-			sti();
 			return;
 		}
 		if(counter == 0)
 		{
 			send_eoi(PIC_1);
-			sti();
 			return;
 		}
 		setx(--x); //These lines delete the character
@@ -226,7 +206,23 @@ void keyboard_read(unsigned char keystroke)
 		//set_cursor(x + 1, y);
 		counter ++;
 	}
-	sti();
+	else if (keystroke >= T1_SWITCH && keystroke <= T3_SWITCH)
+	{
+		switch(keystroke)
+		{
+			case T1_SWITCH:
+				terminal_switch(1);
+				break;
+			case T2_SWITCH:
+				term2_press = 1;
+				terminal_switch(2);
+				break;
+			case T3_SWITCH:
+				term3_press = 1;
+				terminal_switch(3);
+				break;
+		}
+	}
 	return;
 }
 
@@ -435,15 +431,11 @@ int32_t terminal_switch(int32_t t_num)
 {
 	if(cur_terminal == t_num)
 		return 0;
-	find_pid();
 	int cterm = cur_terminal - 1; //for ease of use
 	int i; //counter
 	//get esp and cr3 and save into the current terminal struct
 	asm volatile("movl %%esp, %0;" 
 	:"=r"(terminals[cterm].esp)
-	);
-	asm volatile("movl %%ebp, %0;" 
-	:"=r"(terminals[cterm].ebp)
 	);
 	asm volatile("movl %%CR3, %0;"
 	:"=r"(terminals[cterm].cr3)
@@ -451,12 +443,12 @@ int32_t terminal_switch(int32_t t_num)
 	terminals[cterm].kernel_esp = tss.esp0;
 	//save the old file information back in 
 	int pid = get_pid_from_cr3(terminals[cterm].cr3)+1;
-	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
-	memcpy(&term_pcb, pcbptr, PCB_SIZE);
+	//uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
+	//memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	//terminals[cterm].pcblock = term_pcb;
 	
-	for(i = 0; i < STRUCTS; i++)
-		terminals[cterm].file_struct[i] = term_pcb.file_struct[i];
+	//for(i = 0; i < STRUCTS; i++)
+	//	terminals[cterm].file_struct[i] = term_pcb.file_struct[i];
 	
 	
 	
@@ -519,20 +511,18 @@ int32_t terminal_switch(int32_t t_num)
 	
 	
 	pid = get_pid_from_cr3(terminals[cterm].cr3);
-	pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
-	memcpy(&term_pcb, pcbptr, PCB_SIZE);
+	//pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
+	//memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	
 	//put the old file information back in pcb
-	for(i = 0; i < STRUCTS; i++)
-		term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
-	memcpy(&pcblock, &term_pcb, PCB_SIZE);
-
-	tss.esp0 = terminals[cterm].esp;
+	//for(i = 0; i < STRUCTS; i++)
+		//term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
+	//memcpy(&pcblock, &term_pcb, PCB_SIZE);
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = EIGHT_MB-KB_8*(pid-1) - 4;
 	asm volatile("mov %0, %%CR3":: "b"(terminals[cterm].cr3)
 	);
 	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
-	);
-	asm volatile("mov %0, %%ebp":: "b"(terminals[cterm].ebp)
 	);
 	return 0;
 }
