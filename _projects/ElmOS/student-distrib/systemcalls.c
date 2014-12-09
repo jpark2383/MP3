@@ -166,14 +166,13 @@ int32_t execute (const uint8_t* command)
 	uint32_t new_pid = 7;
 	int i;
 	int cur_pid = find_pid();
-	for(i = 1; i < 7; i++)		// find which process it is from 1 - 6
+	for(i = 1; i < 7; i++)	// find which process it is from 1 - 6
 	{
 		if(i == 2)
 			i = 4;
 		if(tasks[i] == 0)
 		{
 			new_pid = i;
-			
 			break;
 		}
 	}
@@ -185,12 +184,10 @@ int32_t execute (const uint8_t* command)
 	else if(!strncmp((int8_t*)command, "shell", 5) && term2_press)
 	{
 		new_pid = 2;
-		
 	}
 	else if(!strncmp((int8_t*)command, "shell", 5) && term3_press)
 	{
 		new_pid = 3;
-		
 	}
 	tasks[new_pid] = 1;
 	// check if we are running more than 6 programs
@@ -266,7 +263,7 @@ int32_t execute (const uint8_t* command)
 	
 	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = EIGHT_MB-KB_8*(pc-1) - 4;
+	tss.esp0 = EIGHT_MB-KB_8*(cur_pid) - 4;
 	
 	//counter++;
 	/* inline assembly code to push the required variables to perform privilege switch*/
