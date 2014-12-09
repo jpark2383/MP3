@@ -228,7 +228,7 @@ int32_t execute (const uint8_t* command)
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
 	if(new_pid != 1){
-		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(cur_pid) - START -6*STACK_EIGHTKB);
+		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(new_pid) - START -6*STACK_EIGHTKB);
 		memcpy(pcbptr, &pcblock, PCB_SIZE);
 		pcblock.prev_pcb = (uint32_t)pcbptr;
 	}
@@ -335,11 +335,11 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
  */
  int32_t open (const uint8_t* filename)
  {
-	int pid = find_pid();
+	int pid_open = find_pid();
 
 	int index_temp;
 	fd_index = FD_MIN;
-	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*pid - START);
+	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid_open) - START -6*STACK_EIGHTKB);
 	//if filename is invalid, return -1
 	if(filename == NULL)
 	{
