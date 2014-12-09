@@ -8,52 +8,55 @@ No bugs
 CP2:
 ----------------------------------------------------------------------------------------
 
-	- GDT info not cleared from screen while testing keyboard. FIXED: Clearing the screen at startup.
+All bugs fixed on same day for this checkpoint.
+
+	11/1/14 - GDT info not cleared from screen while testing keyboard. FIXED: Clearing the screen at startup.
 	
-	- Right shift key would caps lock after being pressed once. FIXED: Changed value of Right Shift key
+	11/1/14	- Right shift key would caps lock after being pressed once. FIXED: Changed value of Right Shift key
 	
-	- When text buffer was filled up, backspaced would clear characters off screen and not the buffer.
-	FIXED: Keyboard interrupt handler would write more characters than the buffer would handle which was more
-	characters than the conditions allowed, which caused nothing to happen to the buffer when backspacing.
-	Changed a number to not allow too many characters to be written to the buffer.
+	11/1/14	- When text buffer was filled up, backspaced would clear characters off screen and not the buffer.
+		FIXED: Keyboard interrupt handler would write more characters than the buffer would handle which was more
+		characters than the conditions allowed, which caused nothing to happen to the buffer when backspacing.
+		Changed a number to not allow too many characters to be written to the buffer.
 	
-	- Scrolling not working. Each character would be on a new line. FIXED: Changed boundary conditions and buffer for scrolling.
+	11/1/14	- Scrolling not working. Each character would be on a new line. FIXED: Changed boundary conditions and buffer for scrolling.
 	
-	- Read directory was just printing out the directory. FIXED: Write the directory to the buffer and not to the screen.
+	11/1/14	- Read directory was just printing out the directory. FIXED: Write the directory to the buffer and not to the screen.
 
 ----------------------------------------------------------------------------------------
 CP3:
 ----------------------------------------------------------------------------------------
-	- Jump table was not in standard jump table form. FIXED: Changed the jump table to standard jump table form.
-	
-	- Halt produced page faults. FIXED: Saved and loaded critical variables into pcb.
-	
+
+	11/16/14 - Halt produced page faults. 11/16/14 FIXED: Saved and loaded critical variables into pcb.
+
+	11/17/14 - Jump table was not in standard jump table form. 11/17/14 FIXED: Changed the jump table to standard jump table form.
+		
 ----------------------------------------------------------------------------------------
 CP4:
 ----------------------------------------------------------------------------------------
 
-	- Counter not working. FIXED: Wrote to correct buffer.
+	11/30/14 - Counter not working. 12/1/14 FIXED: Wrote to correct buffer.
 	
-	- ls not working. FIXED: Wrote to the buffer instead of printing to the screen
+	11/30/14 - ls not working. 12/1/14 FIXED: Wrote to the buffer instead of printing to the screen
 	
-	- Command not read properly. FIXED: Changed boundary condition to not always be true.
+	11/30/14 - Command not read properly. 12/1/14 FIXED: Changed boundary condition to not always be true.
 	
 ----------------------------------------------------------------------------------------
 CP5:
 ----------------------------------------------------------------------------------------
 
-	- Switching terminals page faults.FIXED:
+	12/6/14 - Switching terminals page faults.FIXED:
 	
-	- Exiting from multiple shells page faults. FIXED:
+	12/6/14- Exiting from multiple shells page faults. FIXED:
 	
-	- Exiting a shell after opening shells in multiple terminals page faults.
+	12/6/14 - Exiting a shell after opening shells in multiple terminals page faults.
 
-	- Switching terminals rapidly page faults.
+	12/6/14 - Switching terminals rapidly page faults.
 
-	- Running fish, pingpong, and counter in each terminal causes page faults.
+	12/8/14 - Running fish, pingpong, and counter in each terminal causes page faults.
 
-	- Running pingpong -> switching terminals -> switching back, freezes pingpong.
+	12/8/14 - Running pingpong -> switching terminals -> switching back, freezes pingpong.
 
-	- Having six running programs and switching terminals page faults.
+	12/8/14 - Having six running programs and switching terminals page faults.
 
-	- After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT. FIXED: value for alt released was wrong.
+	12/8/14 - After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT. FIXED: value for alt released was wrong.

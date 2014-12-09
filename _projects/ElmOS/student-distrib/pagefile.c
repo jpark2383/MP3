@@ -27,19 +27,11 @@ void paging_init()
 		task4_page_directory[i] = EMPTY;
 		task5_page_directory[i] = EMPTY;
 		task6_page_directory[i] = EMPTY;
-		terminal_page_directory[i] = EMPTY;
 	}
 	
 	for(i = 1; i < NUM_ENTRIES_PT; i++)  //initialize entries
 	{
 		page_table[i] = EMPTY;
-		page_table1[i] = EMPTY;
-		page_table2[i] = EMPTY;
-		page_table3[i] = EMPTY;
-		page_table4[i] = EMPTY;
-		page_table5[i] = EMPTY;
-		page_table6[i] = EMPTY;
-		terminal_page_table[i] = EMPTY;
 	}
 	
 	//kernel
