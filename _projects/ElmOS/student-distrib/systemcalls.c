@@ -29,7 +29,7 @@ int32_t halt (uint8_t status)
 	//try to halt from shell, restart shell
 	if(find_pid() <= 3)
 	{
-		int z;
+		//int z;
 		tasks[find_pid()] = 0;
 		pc--;
 		execute((uint8_t*)"shell");		
