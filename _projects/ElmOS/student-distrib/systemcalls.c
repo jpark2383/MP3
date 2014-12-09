@@ -36,8 +36,12 @@ int32_t halt (uint8_t status)
 		
 		return 0;
 	}
+	int i;
 	tasks[find_pid()] = 0;
 	pc = pc-1;
+	/*close all the opened file*/
+	for(i = 2; i < 8; i++)
+		close(i);
 	pcb_t halt_pcb;
 	int pid_h;
 	uint32_t *pcb_h = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()) -START -6*STACK_EIGHTKB);
@@ -47,6 +51,7 @@ int32_t halt (uint8_t status)
 	memcpy(&halt_pcb, pcb_h, PCB_SIZE);
 	//printf("pc: %d\n", pc);
 	// restore parents paging
+	
 	asm volatile ("mov %0, %%CR3":: "r"(halt_pcb.cr3));
 	// restore parents TSS kernel stack
 	tss.esp0 = EIGHT_MB - KB_8*(halt_pcb.pid) - 4;	
