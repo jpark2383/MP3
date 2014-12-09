@@ -442,6 +442,9 @@ int32_t terminal_switch(int32_t t_num)
 	asm volatile("movl %%esp, %0;" 
 	:"=r"(terminals[cterm].esp)
 	);
+	asm volatile("movl %%ebp, %0;" 
+	:"=r"(terminals[cterm].ebp)
+	);
 	asm volatile("movl %%CR3, %0;"
 	:"=r"(terminals[cterm].cr3)
 	);
@@ -470,22 +473,27 @@ int32_t terminal_switch(int32_t t_num)
 		memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	else if (cur_terminal == T3_NUM)
 		memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
-		
+
+	clear();
+	set_cursor(0,0);
+	cur_terminal = t_num;
+	cterm = cur_terminal - 1;
 	if(t_num == 2 && term2_flag == 0)
 	{
 		term2_flag = 1;
+		send_eoi(1);
 		execute((uint8_t*)"shell");
 		return 0;
 	}
 	if(t_num == 3 && term3_flag == 0)
 	{
 		term3_flag = 1;
+		send_eoi(1);
 		execute((uint8_t*)"shell");
 		return 0;
 	}
-	cur_terminal = t_num;
-	cterm = cur_terminal - 1;
-	clear();
+
+
 	
 	// Copies memory from buffer to the video memory
 	if(t_num == T1_NUM)
@@ -525,6 +533,8 @@ int32_t terminal_switch(int32_t t_num)
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = terminals[cterm].esp;
 	asm volatile("mov %0, %%CR3":: "b"(terminals[cterm].cr3)
+	);
+	asm volatile("mov %0, %%ebp":: "b"(terminals[cterm].ebp)
 	);
 	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
 	);
