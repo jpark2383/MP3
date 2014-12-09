@@ -56,4 +56,4 @@ CP5:
 
 	- Having six running programs and switching terminals page faults.
 
-	- After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT.
+	- After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT. FIXED: value for alt released was wrong.

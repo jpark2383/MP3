@@ -53,7 +53,7 @@
 #define LEFT_SHIFT_R		0xAA
 #define RIGHT_SHIFT_R		0xB6
 #define CTRL_RELEASE		0x9D
-#define ALT_RELEASE			0xBA
+#define ALT_RELEASE			0xB8
 #define T1_SWITCH			0xF5
 #define T2_SWITCH			0xF6
 #define T3_SWITCH			0xF7
