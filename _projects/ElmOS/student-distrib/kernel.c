@@ -14,7 +14,6 @@
 #include "pagefile.h"
 #include "terminal.h"
 #include "systemcalls.h"
-#include "scheduler.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */

@@ -248,7 +248,6 @@ int32_t execute (const uint8_t* command)
 	for(i = 2; i <= MAX_FD; i++)
 		pcblock.file_struct[i].flags= 0;
 		
-	//save paging
 	/*flush the tlb*/
 	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
 	asm volatile("movl %0, %%cr3" : : "r" (pd_addr));
