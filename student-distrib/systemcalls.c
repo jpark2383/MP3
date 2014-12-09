@@ -173,7 +173,7 @@ int32_t execute (const uint8_t* command)
 		if(tasks[i] == 0)
 		{
 			new_pid = i;
-			tasks[i] = 1;
+			
 			break;
 		}
 	}
@@ -192,7 +192,7 @@ int32_t execute (const uint8_t* command)
 		new_pid = 3;
 		term3_press = 0;
 	}
-
+	tasks[new_pid] = 1;
 	// check if we are running more than 6 programs
 	if(new_pid == 7)
 	{
