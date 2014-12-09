@@ -1,5 +1,6 @@
 #include "filesystem.h"
 #include "systemcalls.h"
+#include "terminal.h"
 int fd_val;
 /* 
  *   filesystem_init
@@ -303,21 +304,31 @@ int loader(const uint8_t* filename)
 		
 		// think of pc as # of programs running at the moment..
 		// if pc = 0, there are no programs running, so should use task1_pd
-			if (pc ==0)
+			if (pc ==0){
 				asm volatile ("mov %0, %%CR3":: "b"(task1_page_directory));
-			else if (pc ==1)
+				pc++;
+			}
+			else if (term2_press){
 				asm volatile ("mov %0, %%CR3":: "b"(task2_page_directory));
-			else if (pc ==2)
+			}
+			else if (term3_press){
 				asm volatile ("mov %0, %%CR3":: "b"(task3_page_directory));
-			else if (pc ==3)
+			}
+			else if (pc ==1){
 				asm volatile ("mov %0, %%CR3":: "b"(task4_page_directory));
-			else if (pc ==4)
+				pc++;
+			}
+			else if (pc ==2){
 				asm volatile ("mov %0, %%CR3":: "b"(task5_page_directory));
-			else if (pc ==5)
+				pc++;
+			}
+			else if (pc ==3){
 				asm volatile ("mov %0, %%CR3":: "b"(task6_page_directory));
+				pc++;
+			}
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
-		pc = pc+1;
+		//pc = pc+1;
 		return eip;
 	}
 	else
