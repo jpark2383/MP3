@@ -5,6 +5,12 @@
 #include "types.h"
 #include "lib.h"
 
+#define PID1			1
+#define PID2			2
+#define PID3			3
+#define PID4			4
+#define PID5			5
+#define PID6			6
 #define PCB_SIZE		745
 #define MB_132			0x08400000
 #define KB_8			0x2000
@@ -38,16 +44,16 @@
 typedef struct __attribute__((packed)) pcb_t pcb_t;
 struct pcb_t
 {
-	uint32_t prev_pcb;
-	uint32_t esp;
+	uint32_t prev_pcb; // Pointer to previous pcb
+	uint32_t esp; //The following are saved registers
 	uint32_t eip;
 	uint32_t ebp;
 	uint32_t cr3;
-	uint32_t parent_pid;
-	file_struct_t file_struct[8];
+	uint32_t parent_pid; //Pid of parent process
+	file_struct_t file_struct[FILE_ARRAY_SIZE]; //Array of fops
 	
-	dentry_t dentry[8]; 
-	uint8_t cmd_name[CMD_LEN];
+	dentry_t dentry[FILE_ARRAY_SIZE]; //data entries
+	uint8_t cmd_name[CMD_LEN]; //The following are for execution
 	uint8_t arg_name[CMD_LEN];
 	uint8_t data_arg_size;
 };

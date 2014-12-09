@@ -13,8 +13,8 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[MAX_TASKS] = {1,0,0,0,0,0,0}; 
-int term1_rst = 0;
+uint32_t tasks[MAX_TASKS] = {1,0,0,0,0,0,0}; //Array to manage tasks
+int term1_rst = 0; //These are flags for restarting shells
 int term2_rst = 0;
 int term3_rst = 0;
 
@@ -178,14 +178,14 @@ int32_t execute (const uint8_t* command)
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));		// save CR3 into PCB
 	int pd_addr;
 	uint32_t eip = 0;
-	new_pid = 7;
+	new_pid = MAX_TASKS;
 	int i;
 	int cur_pid = find_pid();
 	for(i = 1; i < MAX_TASKS; i++)	// find which task it is from 1 - 6
 	{
 		/* skip task 2 to save it for the shell */
 		if(i == 2)
-			i = 4;
+			i += i;
 		if(tasks[i] == 0)
 		{
 			new_pid = i;
@@ -194,23 +194,23 @@ int32_t execute (const uint8_t* command)
 	}
 	if(pc == 0)
 	{
-		new_pid = 1;
+		new_pid = PID1;
 	}
 	//Check if we are opening terminals
 	else if(!strncmp((int8_t*)command, "shell", 5) && term1_rst)
 	{
 		term1_rst = 0;
-		new_pid = 1;
+		new_pid = PID1;
 	}
 	else if(!strncmp((int8_t*)command, "shell", 5) && (term2_press || term2_rst))
 	{
 		term2_rst = 0;
-		new_pid = 2;
+		new_pid = PID2;
 	}
 	else if(!strncmp((int8_t*)command, "shell", 5) && (term3_press || term3_rst))
 	{
 		term3_rst = 0;
-		new_pid = 3;
+		new_pid = PID3;
 	}
 	// check if we are running more than 6 programs
 	if(new_pid == MAX_TASKS)
@@ -488,17 +488,17 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		if(cr3==(uint32_t)page_directory)
 			return 0;
 		else if(cr3==(uint32_t)task1_page_directory)
-			return 1;
+			return PID1;
 		else if(cr3==(uint32_t)task2_page_directory)
-			return 2;
+			return PID2;
 		else if(cr3==(uint32_t)task3_page_directory)
-			return 3;
+			return PID3;
 		else if(cr3==(uint32_t)task4_page_directory)
-			return 4;
+			return PID4;
 		else if(cr3==(uint32_t)task5_page_directory)
-			return 5;
+			return PID5;
 		else if(cr3==(uint32_t)task6_page_directory)
-			return 6;
+			return PID6;
 		return -1;
  }
 /*
