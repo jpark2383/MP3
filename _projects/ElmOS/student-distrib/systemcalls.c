@@ -291,7 +291,7 @@ int32_t execute (const uint8_t* command)
 	
 	/*set up TSS for kernel mode*/
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = EIGHT_MB-KB_8*(new_pid-1) - 4;
+	tss.esp0 = EIGHT_MB-KB_8*(new_pid-1) - START;
 	
 	/* inline assembly code to push the required variables to perform privilege switch*/
 	asm volatile("              \n\
