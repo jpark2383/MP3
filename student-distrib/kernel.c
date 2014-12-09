@@ -14,6 +14,7 @@
 #include "pagefile.h"
 #include "terminal.h"
 #include "systemcalls.h"
+#include "scheduler.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -172,6 +173,7 @@ entry (unsigned long magic, unsigned long addr)
 	init_fs();
 	enable_irq(PIC_1);
 	terminal_open(0);
+	pit_init();
 	clear();
 
 	/* Enable interrupts */
