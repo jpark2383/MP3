@@ -43,7 +43,7 @@ int32_t halt (uint8_t status)
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(pcblock.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB - KB_8*(pc-1) - 4;	
+	tss.esp0 = EIGHT_MB - KB_8*(find_pid()-1) - 4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
 				 ::"g"(pcblock.esp),"g"(status));
@@ -185,12 +185,12 @@ int32_t execute (const uint8_t* command)
 	else if(!strncmp((int8_t*)command, "shell", 5) && term2_press)
 	{
 		new_pid = 2;
-		term2_press = 0;
+		
 	}
 	else if(!strncmp((int8_t*)command, "shell", 5) && term3_press)
 	{
 		new_pid = 3;
-		term3_press = 0;
+		
 	}
 	tasks[new_pid] = 1;
 	// check if we are running more than 6 programs
@@ -204,7 +204,8 @@ int32_t execute (const uint8_t* command)
 	eip = loader(pcblock.cmd_name);
 	if(eip == -1)
 		return -1;
-		
+	term2_press = 0;
+	term3_press = 0;	
 	pcblock.file_struct[SDIN].flags =1;
 	pcblock.file_struct[SDIN].fops_ptr = &terminal_fops;
 	pcblock.file_struct[SDOUT].flags =1;
