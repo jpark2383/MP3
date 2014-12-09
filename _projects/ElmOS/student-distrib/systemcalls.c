@@ -14,8 +14,9 @@ fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
 uint32_t tasks[7] = {1,0,0,0,0,0,0}; 
-int term2_flag = 0;
-int term3_flag = 0;
+int term1_rst = 0;
+int term2_rst = 0;
+int term3_rst = 0;
 
 /*
  * int32_t halt (uint8_t status)
@@ -26,39 +27,42 @@ int term3_flag = 0;
  */
 int32_t halt (uint8_t status)
 {
+	int pidf = find_pid();
+	int i;
 	//try to halt from shell, restart shell
-	if(find_pid() <= 3)
+	if(pidf <= 3)
 	{
 		//int z;
-		tasks[find_pid()] = 0;
+		if(pidf == 1)
+			term1_rst = 1;
+		else if(pidf == 2)
+			term2_rst = 1;
+		else if(pidf == 3)
+			term3_rst = 1;
+		tasks[pidf] = 0;
 		pc--;
 		execute((uint8_t*)"shell");		
 		
 		return 0;
 	}
-	int i;
-	tasks[find_pid()] = 0;
+	
 	pc = pc-1;
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(tasks[pidf] + 6) - START);
+	pcb_t temp_pcb;
+	memcpy(&temp_pcb, pcbptr, PCB_SIZE);
+	tasks[pidf] = 0;
 	/*close all the opened file*/
 	for(i = 2; i < 8; i++)
 		close(i);
-	pcb_t halt_pcb;
-	int pid_h;
-	uint32_t *pcb_h = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(find_pid()) -START -6*STACK_EIGHTKB);
-	memcpy(&halt_pcb, pcb_h, PCB_SIZE);
-	pid_h = halt_pcb.pid;
-	pcb_h = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid_h) -START -6*STACK_EIGHTKB);
-	memcpy(&halt_pcb, pcb_h, PCB_SIZE);
 	//printf("pc: %d\n", pc);
 	// restore parents paging
-	
-	asm volatile ("mov %0, %%CR3":: "r"(halt_pcb.cr3));
+	asm volatile ("mov %0, %%CR3":: "r"(temp_pcb.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB - KB_8*(halt_pcb.pid) - 4;	
+	tss.esp0 = EIGHT_MB - KB_8*(find_pid()) - 4;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
-				 ::"g"(halt_pcb.esp),"g"(status));
-	asm volatile("movl %0, %%ebp"::"g"(halt_pcb.ebp));
+				 ::"g"(temp_pcb.esp),"g"(status));
+	asm volatile("movl %0, %%ebp"::"g"(temp_pcb.ebp));
 	
 	asm volatile("popl %eax");
 	//
@@ -174,7 +178,7 @@ int32_t execute (const uint8_t* command)
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));		// save CR3 into PCB
 	int pd_addr;
 	uint32_t eip = 0;
-	uint32_t new_pid = 7;
+	new_pid = 7;
 	int i;
 	int cur_pid = find_pid();
 	for(i = 1; i < 7; i++)	// find which process it is from 1 - 6
@@ -192,20 +196,41 @@ int32_t execute (const uint8_t* command)
 		new_pid = 1;
 	}
 	//Check if we are opening terminals
-	else if(!strncmp((int8_t*)command, "shell", 5) && term2_press)
+	else if(!strncmp((int8_t*)command, "shell", 5) && term1_rst)
 	{
+		term1_rst = 0;
+		new_pid = 1;
+	}
+	else if(!strncmp((int8_t*)command, "shell", 5) && (term2_press || term2_rst))
+	{
+		term2_rst = 0;
 		new_pid = 2;
 	}
-	else if(!strncmp((int8_t*)command, "shell", 5) && term3_press)
+	else if(!strncmp((int8_t*)command, "shell", 5) && (term3_press || term3_rst))
 	{
+		term3_rst = 0;
 		new_pid = 3;
 	}
-	tasks[new_pid] = 1;
 	// check if we are running more than 6 programs
 	if(new_pid == 7)
 	{
 		write(1, "6 programs already open.\n", 25);
 		return -1;
+	}
+	if(cur_pid == 0) cur_pid++;
+	tasks[new_pid] = cur_pid;
+	//save the esp and ebp
+	asm volatile("movl %%esp, %0"
+     :"=r"(pcblock.esp)
+     );
+	asm volatile("movl %%ebp, %0" 
+	: "=a"(pcblock.ebp)
+	:
+	: "cc" );
+	if(new_pid != 1){
+		uint32_t *pcbptra = (uint32_t *)(EIGHT_MB - KB_8*(cur_pid) - START -6*KB_8);
+		memcpy(pcbptra, &pcblock, PCB_SIZE);
+		pcblock.prev_pcb = (uint32_t)pcbptra;
 	}
 
 	parse_cmd(command);
@@ -227,24 +252,16 @@ int32_t execute (const uint8_t* command)
 	asm volatile("movl %%cr3, %0" : "=r" (pd_addr));
 	asm volatile("movl %0, %%cr3" : : "r" (pd_addr));
 
-	//save the esp
-	asm volatile("movl %%esp, %0"
-     :"=r"(pcblock.esp)
-     );
-	asm volatile("movl %%ebp, %0" 
-	: "=a"(pcblock.ebp)
-	:
-	: "cc" );
-	
+
+	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
-	pcblock.pid = new_pid;
-	if(new_pid != 1){
-		uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(new_pid) - START -6*STACK_EIGHTKB);
-		memcpy(pcbptr, &pcblock, PCB_SIZE);
-		pcblock.prev_pcb = (uint32_t)pcbptr;
-	}
-	
+	//if(new_pid != 1){
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(new_pid) - START -6*KB_8);
+	memcpy(pcbptr, &pcblock, PCB_SIZE);
+	pcblock.prev_pcb = (uint32_t)pcbptr;
+	//}
+	pcblock.parent_pid = cur_pid;
 	switch(new_pid)
 	{
 		case 0:

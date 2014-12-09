@@ -1,4 +1,4 @@
-	#ifndef _TERMINAL_H
+#ifndef _TERMINAL_H
 #define _TERMINAL_H
 
 #include "lib.h"
