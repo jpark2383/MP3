@@ -393,7 +393,7 @@ int32_t terminal_switch(int32_t t_num)
 	
 	for(i = 0; i < STRUCTS; i++)
 		terminals[cterm].file_struct[i] = term_pcb.file_struct[i];
-	
+	terminals[cterm].counter = counter;
 	
 	
 	terminals[cterm].pos_x = getx();
@@ -456,6 +456,7 @@ int32_t terminal_switch(int32_t t_num)
 	// Sets old line buffers data
 	for(i = 0; i < BUF_MAX; i++)
 		text_buf[i] = terminals[cterm].t_linebuffer[i];			
+	counter = terminals[cterm].counter;
 	send_eoi(PIC_1);
 	
 	

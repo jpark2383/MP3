@@ -38,6 +38,7 @@ typedef struct terminal_t
 	unsigned char t_linebuffer[BUF_MAX];
 	int pos_x;
 	int pos_y;
+	int counter;
 	uint32_t esp;
 	uint32_t ebp;
 	uint32_t kernel_esp;

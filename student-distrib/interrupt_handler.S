@@ -1,6 +1,5 @@
 .globl	keyboard_handler
 .globl  rtc_handler
-.globl  pit_handler
 
 /*interrupt handler for keyboard, save all the registers and call read_keyboard*/
 keyboard_handler:
@@ -72,37 +71,3 @@ _rtc_handler:
 		
 		iret		
 
-/*interrupt handler for the pit*/
-pit_handler:
-_pit_handler:		
-
-		cli
-		
-		pushl %fs
-		pushl %es
-		pushl %ds
-		pushl %eax
-		pushl %ebx
-		pushl %ebp
-		pushl %ecx
-		pushl %edx
-		pushl %edi
-		pushl %esi
-		
-	
-		call pit_intr_handler
-		
-		popl %esi
-		popl %edi
-		popl %edx
-		popl %ecx
-		popl %ebp
-		popl %ebx
-		popl %eax
-		popl %ds
-		popl %es
-		popl %fs
-
-		sti
-		
-		iret		
