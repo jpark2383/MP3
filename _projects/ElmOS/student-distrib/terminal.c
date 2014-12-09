@@ -435,7 +435,7 @@ int32_t terminal_switch(int32_t t_num)
 {
 	if(cur_terminal == t_num)
 		return 0;
-
+	find_pid();
 	int cterm = cur_terminal - 1; //for ease of use
 	int i; //counter
 	//get esp and cr3 and save into the current terminal struct
@@ -448,9 +448,10 @@ int32_t terminal_switch(int32_t t_num)
 	asm volatile("movl %%CR3, %0;"
 	:"=r"(terminals[cterm].cr3)
 	);
+	terminals[cterm].kernel_esp = tss.esp0;
 	//save the old file information back in 
-	int pid = get_pid_from_cr3(terminals[cterm].cr3);
-	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
+	int pid = get_pid_from_cr3(terminals[cterm].cr3)+1;
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
 	memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	//terminals[cterm].pcblock = term_pcb;
 	
@@ -492,7 +493,8 @@ int32_t terminal_switch(int32_t t_num)
 		execute((uint8_t*)"shell");
 		return 0;
 	}
-
+	term2_press = 0;
+	term3_press = 0;
 
 	
 	// Copies memory from buffer to the video memory
@@ -517,28 +519,21 @@ int32_t terminal_switch(int32_t t_num)
 	
 	
 	pid = get_pid_from_cr3(terminals[cterm].cr3);
-	pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START);
+	pcbptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START -6*STACK_EIGHTKB);
 	memcpy(&term_pcb, pcbptr, PCB_SIZE);
 	
 	//put the old file information back in pcb
 	for(i = 0; i < STRUCTS; i++)
 		term_pcb.file_struct[i] = terminals[cterm].file_struct[i];
-	//term_pcb = terminals[cterm].pcblock;	
 	memcpy(&pcblock, &term_pcb, PCB_SIZE);
 
-	/*if(!scheduling_enable)
-	{*/	
-	tss.ss0 = KERNEL_DS;
 	tss.esp0 = terminals[cterm].esp;
 	asm volatile("mov %0, %%CR3":: "b"(terminals[cterm].cr3)
 	);
-	asm volatile("mov %0, %%ebp":: "b"(terminals[cterm].ebp)
-	);
 	asm volatile("mov %0, %%esp":: "b"(terminals[cterm].esp)
 	);
-
-	
-	/*}*/
+	asm volatile("mov %0, %%ebp":: "b"(terminals[cterm].ebp)
+	);
 	return 0;
 }
 
