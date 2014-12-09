@@ -481,14 +481,14 @@ int32_t terminal_switch(int32_t t_num)
 	if(t_num == 2 && term2_flag == 0)
 	{
 		term2_flag = 1;
-		send_eoi(1);
+		send_eoi(PIC_1);
 		execute((uint8_t*)"shell");
 		return 0;
 	}
 	if(t_num == 3 && term3_flag == 0)
 	{
 		term3_flag = 1;
-		send_eoi(1);
+		send_eoi(PIC_1);
 		execute((uint8_t*)"shell");
 		return 0;
 	}
@@ -504,9 +504,7 @@ int32_t terminal_switch(int32_t t_num)
 		memcpy((uint32_t*)V_MEM_ADDR,(uint32_t*)TERM3,MEM_4KB);
 	
 	// Sets appropriate x and y positions
-	setx(terminals[cterm].pos_x);
-	sety(terminals[cterm].pos_y);
-	
+	set_cursor(terminals[cterm].pos_x, terminals[cterm].pos_y);	
 	
 	
 	// Sets old line buffers data
