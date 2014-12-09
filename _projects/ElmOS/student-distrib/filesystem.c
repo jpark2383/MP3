@@ -170,7 +170,7 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 int32_t filesystem_open(const uint8_t* filename)
 {
 	if((strncmp((const int8_t*)filename, (const int8_t*)"" , 1)) != 0)
-		return read_dentry_by_name(filename, &pcblock.dentry[0]);
+		return read_dentry_by_name(filename, &pcblock.dentry[fd_val]);
 	else
 		return -1;
 }
