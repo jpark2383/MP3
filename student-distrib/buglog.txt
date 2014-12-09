@@ -55,3 +55,5 @@ CP5:
 	- Running pingpong -> switching terminals -> switching back, freezes pingpong.
 
 	- Having six running programs and switching terminals page faults.
+
+	- After opening terminals, we could switch terminals by pressing only Function keys without pressing ALT.
