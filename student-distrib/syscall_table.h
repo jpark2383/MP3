@@ -1,3 +1,8 @@
+/* syscall_table.h - jump table of system calls
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #ifndef _SYSCALL_TABLE
 #define _SYSCALL_TABLE
 #include "types.h"

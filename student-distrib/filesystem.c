@@ -1,7 +1,9 @@
 #include "filesystem.h"
 #include "systemcalls.h"
 #include "terminal.h"
-int fd_val;
+
+int fd_val; // global variable for file descriptor
+
 /* 
  *   filesystem_init
  *   DESCRIPTION: Initializes the filesystem driver
@@ -74,12 +76,12 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 {
 
 	uint32_t *inode_ptr , data_length , index , i , block_num;
-	//uint8_t * temp;
 	uint32_t * block_ptr ;
 	uint8_t * block_p8tr;
 	uint8_t index_flag;
 	uint32_t rval , left;
 	uint8_t * bufholder;
+	
 	/*clear the buffer first*/
 	for(i=0;i<length;i++)
 		buf[i]=0;
@@ -88,6 +90,7 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 
 	inode_ptr = BOOT_BLOCK_PTR + (inode + 1)*BYTES_4K;
 	data_length = *inode_ptr;
+	
 	/*means it is read*/
 	if(offset>=data_length)
 		return 0;
@@ -106,18 +109,18 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 		rval=length;
 		left=rval;
 	}
+	
 	/*get the block num*/
 	i = offset/ONE_BLOCK_SIZE;
 	index = offset % ONE_BLOCK_SIZE;
 	index_flag=1;
 	
-
 	while(left>0)
 	{
-
 		block_num=* (inode_ptr + ((i+1)*BYTES_4) );
 		block_ptr=filesystem.data_start + (block_num)*BYTES_4K;
 		block_p8tr=(uint8_t *)block_ptr;
+
 		/*check to see if it is the first block*/
 		if(index_flag)
 		{
@@ -136,6 +139,7 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 				i++;
 			}
 		}
+
 		/*keep reading the rest of the blocks*/
 		else
 		{
@@ -151,15 +155,14 @@ int32_t read_data (uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t lengt
 				memcpy(bufholder,block_p8tr,left);
 				left=0;
 			}
-
-
 		}
 
 	}
+
 	pcblock.file_struct[fd_val].fpos=offset+rval;
-	return rval;
-	
+	return rval;	
 }
+
 /* 
  * filesystem_open
  *   DESCRIPTION: filesytem's open function
@@ -174,6 +177,7 @@ int32_t filesystem_open(const uint8_t* filename)
 	else
 		return -1;
 }
+
 /* 
  * filesystem_close
  *   DESCRIPTION: filesytem's close function
@@ -194,6 +198,7 @@ int32_t filesystem_close(int32_t fd)
 	pcblock.file_struct[fd].flags = 0;
 	return 0;
 }
+
 /* 
  * filesystem_read
  *   DESCRIPTION: filesytem's read function
@@ -210,7 +215,8 @@ int32_t filesystem_read(int32_t fd, void* buf, int32_t nbytes)
 	}
 	return read_data(pcblock.dentry[fd].inode_number, pcblock.file_struct[fd].fpos, buf, nbytes);
 }
- /* 
+
+/* 
  * filesystem_write	
  *   DESCRIPTION: filesytem's write function
  *   INPUTS: fd,buffer to write data to, #of bytes to read	
@@ -221,6 +227,14 @@ int32_t filesystem_write(int32_t fd, const void* buf, int32_t nbytes)
 {
     return -1;
 }
+
+/* 
+ *   diropen, dirclose
+ *   DESCRIPTION: helper for system calls for directories
+ *   INPUTS: filename for open, fd for close
+ *   RETURN VALUE: 0
+ *   SIDE EFFECTS: none
+ */
 int32_t diropen(const uint8_t* filename)
 {
     return 0;
@@ -230,14 +244,14 @@ int32_t dirclose(int32_t fd)
     return 0;
     
 }
+
 /* 
  *   dirread
  *   DESCRIPTION: searches the directory entries for regular files
  *   INPUTS: none	
  *   RETURN VALUE: none
  *   SIDE EFFECTS: prints the directory to the terminal screen
- */
- 
+ */ 
 int32_t dirread(int32_t fd, void* buf)
 {
 	uint32_t temp = 0;
@@ -255,6 +269,7 @@ int32_t dirread(int32_t fd, void* buf)
 		return strlen(currptr);
 	}
 }
+ 
  /* 
  *   filesystem_write	
  *   DESCRIPTION: directory write function
@@ -262,42 +277,47 @@ int32_t dirread(int32_t fd, void* buf)
  *   RETURN VALUE: -1 as it is a read-only file system
  *   SIDE EFFECTS: does nothing
  */
- 
-int32_t dirwrite()
+ int32_t dirwrite()
 {
 	return -1;
 }
+
 /*
  *   loader
  *   DESCRIPTION: check if the file is executable, if it is load it in programming memory
  *   INPUTS: name of the file
  *   RETURN VALUE: eip if success, -1 if fail 
  *   SIDE EFFECTS: does nothing
-*
-*/
+ *
+ */
 int loader(const uint8_t* filename)
 {
     uint32_t inode, data_length, block_num, eip;
 	uint32_t *inode_ptr;
 	uint32_t *block_ptr;
 	uint8_t buf[B_4];
+
 	if(read_dentry_by_name(filename, &dentry1) == -1)
 		return  -1; //File not found
+
 	/*check if the file is executable*/
 	inode = dentry1.inode_number;
 	inode_ptr = BOOT_BLOCK_PTR + (inode + 1) * BYTES_4K;
 	data_length = *(inode_ptr);
+
 	//check if data length is valid
 	if(data_length< B_4)
 		return -1;
 	block_num = *(inode_ptr + BYTES_4);
 	block_ptr = filesystem.data_start + block_num * BYTES_4K;
 	memcpy(buf, block_ptr, B_4);
+
 	/*executable*/
 	if(buf[0] == MAGIC_NUM_1 && buf[B_1] == MAGIC_NUM_2 && buf[B_2] ==MAGIC_NUM_3 && buf[B_3] == MAGIC_NUM_4)
 	{
 		uint8_t * data_buf = (uint8_t *)NEW_LOAD;
 		read_data(dentry1.inode_number, 0, (uint8_t*)data_buf, data_length);
+
 		/*get the eip*/
 		eip = data_buf[S_27] << B_24 | data_buf[S_26] << B_16 | data_buf[S_25] << B_8  | data_buf[S_24];
 		//printf("in loader pc = %d\n", pc);
@@ -326,6 +346,7 @@ int loader(const uint8_t* filename)
 				asm volatile ("mov %0, %%CR3":: "b"(task6_page_directory));
 				pc++;
 			}
+
 		//load the program into execution space. 
 		memcpy((uint32_t *)PROGRAM_IMG, data_buf, data_length);
 		//pc = pc+1;

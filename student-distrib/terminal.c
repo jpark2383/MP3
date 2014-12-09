@@ -4,7 +4,7 @@
 #include "rtc.h"
 #include "systemcalls.h"
 
-//declare arrays and variabls for text, history, counter, newline detector
+//declare arrays and variables for text, history, counter, newline detector
 unsigned char text_buf[BUF_MAX];
 unsigned int counter;
 int entered = 0;
@@ -12,7 +12,6 @@ int cur_terminal = 1;
 static int term2_flag = 0;
 static int term3_flag = 0;
 pcb_t term_pcb;
-//int newline = 0;
 
 /*
  * set_cursor
@@ -22,7 +21,6 @@ pcb_t term_pcb;
  * RETURN: NONE
  * SIDE EFFECTS: Moves the cursor
  */
-
 void set_cursor(int x, int y)
 {
 	uint32_t position = y*WIDTH + x;
@@ -41,7 +39,6 @@ void set_cursor(int x, int y)
  * OUTPUT: NONE
  * RETURN: 0 for success
  */
-
 int32_t terminal_open(const uint8_t *filename)
 {
 	// use a loop to initialize the buffer to 0
@@ -65,7 +62,6 @@ int32_t terminal_open(const uint8_t *filename)
  * OUTPUT: NONE
  * RETURN: -1 on success
  */
-
 int32_t terminal_close(int32_t fd)
 {
 	disable_irq(PIC_1);
@@ -80,7 +76,6 @@ int32_t terminal_close(int32_t fd)
  * RETURN: NONE
  * SIDE EFFECTS: May print to the screen, move the cursor, delete characters, etc.
  */
-
 void keyboard_read(unsigned char keystroke)
 {
 	//printf("keyboard_read called \n");
@@ -135,17 +130,10 @@ void keyboard_read(unsigned char keystroke)
 			text_buf[counter] = keystroke;
 			counter = 0;
 			entered = 1;
-			//newline = 1;
 		}
-		//set_cursor(0, y + 1);
 	}
 	else if(keystroke == BACKSPACE)
 	{
-		/*if(newline) // If line already empty
-		{
-			send_eoi(PIC_1);
-			return;
-		}*/
 		for(i = 0; i < BUF_MIN; i++)
 		{
 			buf[i] = get_char(i, y);
@@ -162,17 +150,14 @@ void keyboard_read(unsigned char keystroke)
 		}
 		setx(--x); //These lines delete the character
 		putc(' ');
-		//setx(x);
 		text_buf[--counter] = NULL; //Remove char from buffer
 		set_cursor(x,y);
-		//counter--;
 	}
 	// These are all the actual characters. Save to buffer and write to screen.
 	else if((keystroke >= ' ') && (keystroke <= '~') && (counter < BUF_MAX - 1))
 	{
 		text_buf[counter] = keystroke;
 		putc(keystroke);
-		//set_cursor(x + 1, y);
 		counter ++;
 	}
 	else if (keystroke >= T1_SWITCH && keystroke <= T3_SWITCH)
@@ -198,7 +183,7 @@ void keyboard_read(unsigned char keystroke)
 /*
  * read_helper
  * writes keyboard data to the buffer to be written to the terminal
- * INPUT: fd: file discriptor
+ * INPUT: fd: file descriptor
  *		*text: the buf with text
  *		length:length of the buf
  * OUTPUT: NONE
@@ -239,7 +224,6 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  * OUTPUT: NONE
  * RETURN: display_terminal number
  */
-
  int32_t write_helper(const uint8_t* text, int32_t length)
  {
  	cli();
@@ -269,7 +253,6 @@ int32_t read_helper(uint8_t *buf, int32_t length)
 					}
 				}
 			}
-			//clear();
 			//shift the screen
 			for(i = 1; i < HEIGHT; i++)
 			{
@@ -310,7 +293,6 @@ int32_t read_helper(uint8_t *buf, int32_t length)
  */
 int32_t terminal_write(int32_t fd, const void* buf, int32_t len)
 {
-	//printf("terminal write called\n");
 	if (fd == 0) return -1;
 	return write_helper((uint8_t*)buf, len);
 }
@@ -333,19 +315,13 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t len)
  * one at a time.
  * INPUT: none
  * OUTPUT: none
- * SIDE EFFECTS: videomemory is put into memory
+ * SIDE EFFECTS: video memory is put into memory
  */
-
 void multi_init()
 {	
 	memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM2,(uint32_t*)V_MEM_ADDR,MEM_4KB);
 	memcpy((uint32_t*)TERM3,(uint32_t*)V_MEM_ADDR,MEM_4KB);
-	/*
-	int32_t freq = 32;
-	
-	rtc_init();
-	rtc_write (0,&freq, 4);*/
 }
 
 /*
@@ -379,8 +355,6 @@ int32_t terminal_switch(int32_t t_num)
 	
 	for(i = 0; i < STRUCTS; i++)
 		terminals[cterm].file_struct[i] = term_pcb.file_struct[i];
-	
-	
 	
 	terminals[cterm].pos_x = getx();
 	terminals[cterm].pos_y = gety();
@@ -438,14 +412,10 @@ int32_t terminal_switch(int32_t t_num)
 	// Sets appropriate x and y positions
 	set_cursor(terminals[cterm].pos_x, terminals[cterm].pos_y);	
 	
-	
 	// Sets old line buffers data
 	for(i = 0; i < BUF_MAX; i++)
 		text_buf[i] = terminals[cterm].t_linebuffer[i];			
 	send_eoi(PIC_1);
-	
-	
-	
 	
 	pid = get_pid_from_cr3(terminals[cterm].cr3);
 	pcbptr_1 = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid) -START - S_6*STACK_EIGHTKB);
