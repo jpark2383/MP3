@@ -32,7 +32,6 @@ int32_t halt (uint8_t status)
 	//try to halt from shell, restart shell
 	if(pidf <= T_SHELL_MAX)
 	{
-		//int z;
 		if(pidf == T_1)
 			term1_rst = 1;
 		else if(pidf == T_2)
@@ -51,10 +50,11 @@ int32_t halt (uint8_t status)
 	pcb_t temp_pcb;
 	memcpy(&temp_pcb, pcbptr, PCB_SIZE);
 	tasks[pidf] = 0;
+	
 	/*close all the opened file*/
 	for(i = FILE_MIN; i < FILE_MAX; i++)
 		close(i);
-	//printf("pc: %d\n", pc);
+	
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(temp_pcb.cr3));
 	// restore parents TSS kernel stack
@@ -136,7 +136,7 @@ void parse_cmd(const uint8_t * input)
 	//in the event that the first character is not a space
 	else
 	{
-		//iterate through the string and seperate the cmd from the arg.
+		//iterate through the string and separate the cmd from the arg.
 		for(i = 0; i < input_length; i++)
 		{
 			//if switch_flag = 0, we're reading the command
@@ -255,13 +255,11 @@ int32_t execute (const uint8_t* command)
 
 
 	asm volatile ("movl %%CR3, %0": "=b"(pcblock.cr3));
-	// if it is the first process, don't do anything
-	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
-	//if(new_pid != 1){
+	
 	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(new_pid) - START - T_6*KB_8);
 	memcpy(pcbptr, &pcblock, PCB_SIZE);
 	pcblock.prev_pcb = (uint32_t)pcbptr;
-	//}
+	
 	pcblock.parent_pid = cur_pid;
 	switch(new_pid)
 	{
@@ -295,7 +293,6 @@ int32_t execute (const uint8_t* command)
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = EIGHT_MB-KB_8*(new_pid-1) - 4;
 	
-	//counter++;
 	/* inline assembly code to push the required variables to perform privilege switch*/
 	asm volatile("              \n\
 		cli 				\n\

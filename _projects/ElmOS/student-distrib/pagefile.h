@@ -1,3 +1,8 @@
+/* pagefile.h - Defines used to support paging
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #include "types.h"
 #include "lib.h"
 #include "x86_desc.h"

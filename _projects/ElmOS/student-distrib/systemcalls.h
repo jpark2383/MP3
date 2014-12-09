@@ -1,3 +1,8 @@
+/* systemcalls.h - Defines for supporting system calls
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #ifndef _SYSTEMCALLS_H
 #define _SYSTEMCALLS_H
 

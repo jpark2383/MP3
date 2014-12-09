@@ -1,3 +1,8 @@
+/* terminal.h - Terminal definition
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
 

@@ -1,3 +1,8 @@
+/* filesystem.h - Defines used for the filesystem
+ * controller
+ * vim:ts=4 noexpandtab
+ */
+
 #ifndef _FILESYSTEM_H
 #define _FILESYSTEM_H
 
@@ -42,7 +47,7 @@
 #define NEW_LOAD 0x600000 + 0x1000 * 5
 
 
-//declartion of data entry struct
+//declaration of data entry struct
 typedef struct dentry
 {
 	uint8_t file_name[B_32];
