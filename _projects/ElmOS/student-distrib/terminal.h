@@ -18,7 +18,8 @@
 #define SHIFT				8
 #define BUF_MAX				128
 #define BUF_MIN				7
-
+#define S_4					4
+#define S_6					6
 #define MEM_128MB		0x8000000   
 #define MEM_32MB		0x02000000
 #define MEM_6MB			0x600000

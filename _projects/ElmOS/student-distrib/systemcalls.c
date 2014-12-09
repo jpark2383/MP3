@@ -13,7 +13,7 @@ int fd_rtc = 0;
 fops_t rtc_fops = {&rtc_open, &rtc_read, &rtc_write, &rtc_close};
 fops_t terminal_fops = {&terminal_open, &terminal_read, &terminal_write, &terminal_close};
 fops_t filesystem_fops = {&filesystem_open, &filesystem_read, &terminal_write, &filesystem_close};
-uint32_t tasks[7] = {1,0,0,0,0,0,0}; 
+uint32_t tasks[MAX_TASKS] = {1,0,0,0,0,0,0}; 
 int term1_rst = 0;
 int term2_rst = 0;
 int term3_rst = 0;
@@ -30,14 +30,14 @@ int32_t halt (uint8_t status)
 	int pidf = find_pid();
 	int i;
 	//try to halt from shell, restart shell
-	if(pidf <= 3)
+	if(pidf <= T_SHELL_MAX)
 	{
 		//int z;
-		if(pidf == 1)
+		if(pidf == T_1)
 			term1_rst = 1;
-		else if(pidf == 2)
+		else if(pidf == T_2)
 			term2_rst = 1;
-		else if(pidf == 3)
+		else if(pidf == T_3)
 			term3_rst = 1;
 		tasks[pidf] = 0;
 		pc--;
@@ -47,18 +47,18 @@ int32_t halt (uint8_t status)
 	}
 	
 	pc = pc-1;
-	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(tasks[pidf] + 6) - START);
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(tasks[pidf] + T_6) - START);
 	pcb_t temp_pcb;
 	memcpy(&temp_pcb, pcbptr, PCB_SIZE);
 	tasks[pidf] = 0;
 	/*close all the opened file*/
-	for(i = 2; i < 8; i++)
+	for(i = FILE_MIN; i < FILE_MAX; i++)
 		close(i);
 	//printf("pc: %d\n", pc);
 	// restore parents paging
 	asm volatile ("mov %0, %%CR3":: "r"(temp_pcb.cr3));
 	// restore parents TSS kernel stack
-	tss.esp0 = EIGHT_MB - KB_8*(find_pid()-1) - 4;	
+	tss.esp0 = EIGHT_MB - KB_8*(find_pid()-1) - START;	
 	asm volatile("movl %0, %%esp	;"
 				 "pushl %1			;"
 				 ::"g"(temp_pcb.esp),"g"(status));
@@ -181,8 +181,9 @@ int32_t execute (const uint8_t* command)
 	new_pid = 7;
 	int i;
 	int cur_pid = find_pid();
-	for(i = 1; i < 7; i++)	// find which process it is from 1 - 6
+	for(i = 1; i < MAX_TASKS; i++)	// find which task it is from 1 - 6
 	{
+		/* skip task 2 to save it for the shell */
 		if(i == 2)
 			i = 4;
 		if(tasks[i] == 0)
@@ -212,7 +213,7 @@ int32_t execute (const uint8_t* command)
 		new_pid = 3;
 	}
 	// check if we are running more than 6 programs
-	if(new_pid == 7)
+	if(new_pid == MAX_TASKS)
 	{
 		write(1, "6 programs already open.\n", 25);
 		return -1;
@@ -228,7 +229,7 @@ int32_t execute (const uint8_t* command)
 	:
 	: "cc" );
 	if(new_pid != 1){
-		uint32_t *pcbptra = (uint32_t *)(EIGHT_MB - KB_8*(cur_pid) - START -6*KB_8);
+		uint32_t *pcbptra = (uint32_t *)(EIGHT_MB - KB_8*(cur_pid) - START - T_6*KB_8);
 		memcpy(pcbptra, &pcblock, PCB_SIZE);
 		pcblock.prev_pcb = (uint32_t)pcbptra;
 	}
@@ -257,7 +258,7 @@ int32_t execute (const uint8_t* command)
 	// if it is the first process, don't do anything
 	// if it is not the first program, link it to pcblock.prev_pcb, push it onto stack
 	//if(new_pid != 1){
-	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(new_pid) - START -6*KB_8);
+	uint32_t *pcbptr = (uint32_t *)(EIGHT_MB - KB_8*(new_pid) - START - T_6*KB_8);
 	memcpy(pcbptr, &pcblock, PCB_SIZE);
 	pcblock.prev_pcb = (uint32_t)pcbptr;
 	//}
@@ -312,7 +313,7 @@ int32_t execute (const uint8_t* command)
 		iret 				\n\
 		"
 		: 
-		: "g"(USER_DS), "g"(MB_132 - 4), "g"(USER_CS), "g"(eip)
+		: "g"(USER_DS), "g"(MB_132 - START), "g"(USER_CS), "g"(eip)
 		: "eax", "memory"
 	);
 	return 0;
@@ -368,7 +369,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 
 	int index_temp;
 	fd_index = FD_MIN;
-	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid_open) - START -6*STACK_EIGHTKB);
+	uint32_t *pcb_ptr = (uint32_t *)(EIGHT_MB - STACK_EIGHTKB*(pid_open) - START - T_6*STACK_EIGHTKB);
 	//if filename is invalid, return -1
 	if(filename == NULL)
 	{
@@ -514,7 +515,7 @@ int32_t getargs (uint8_t* buf, int32_t nbytes)
 	{
 		return -1;
 	}
-	for(i=0;i<1024;i++)
+	for(i=0;i<BUFF_MAX;i++)
 	{
 		buf[i]=NULL;
 	}
