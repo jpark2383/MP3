@@ -458,7 +458,7 @@ int32_t terminal_switch(int32_t t_num)
 	// Saves the current line buffer
 	for(i = 0; i < BUF_MAX; i++)
 		terminals[cterm].t_linebuffer[i] = text_buf[i];
-	
+
 	// Copies current video memory to buffer
 	if(cur_terminal == T1_NUM)
 		memcpy((uint32_t*)TERM1,(uint32_t*)V_MEM_ADDR,MEM_4KB);
@@ -473,6 +473,10 @@ int32_t terminal_switch(int32_t t_num)
 	cterm = cur_terminal - 1;
 	if(t_num == 2 && term2_flag == 0)
 	{
+		for(i = 0; i < BUF_MAX; i++)
+			text_buf[i] = NULL;
+			
+		counter = 0; 
 		term2_flag = 1;
 		send_eoi(PIC_1);
 		execute((uint8_t*)"shell");
@@ -480,6 +484,10 @@ int32_t terminal_switch(int32_t t_num)
 	}
 	if(t_num == 3 && term3_flag == 0)
 	{
+		for(i = 0; i < BUF_MAX; i++)
+			text_buf[i] = NULL;
+			
+		counter = 0; 
 		term3_flag = 1;
 		send_eoi(PIC_1);
 		execute((uint8_t*)"shell");
@@ -503,8 +511,7 @@ int32_t terminal_switch(int32_t t_num)
 	
 	// Sets old line buffers data
 	for(i = 0; i < BUF_MAX; i++)
-		text_buf[i] = terminals[cterm].t_linebuffer[i];
-				
+		text_buf[i] = terminals[cterm].t_linebuffer[i];			
 	send_eoi(PIC_1);
 	
 	
