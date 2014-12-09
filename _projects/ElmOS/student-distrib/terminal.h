@@ -42,6 +42,7 @@ typedef struct terminal_t
 	uint32_t ebp;
 	uint32_t kernel_esp;
 	uint32_t cr3;
+	uint32_t lb_ctr;
 	file_struct_t file_struct[8];
 } terminal_t;
 
